@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas</title>
+<style>
+  /* Reset */
+  * {margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+
+  html, body {
+    height:100%;
+    transition: background 0.5s, color 0.5s;
+  }
+
+  body.light {
+    background: url('https://sanvaclive.github.io/savnac/images/background/bg2.jpg') no-repeat center center/cover;
+    color:#000;
+  }
+
+  body.dark {
+    background: url('https://sanvaclive.github.io/savnac/images/background/bg1.jpg') no-repeat center center/cover;
+    color:#fff;
+  }
+
+  /* Top Bar */
+  #topbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 20px;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:1000;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(5px);
+  }
+
+  #topbar .buttons {
+    display:flex;
+    gap:10px;
+  }
+
+  #topbar .buttons img {
+    width:40px;
+    height:40px;
+    cursor:pointer;
+    transition: transform 0.2s;
+  }
+
+  #topbar .buttons img:hover {
+    transform: scale(1.1);
+  }
+
+  #topbar .logo img {
+    height:60px;
+  }
+
+  /* Pages */
+  .page {
+    display:none;
+    padding-top:90px; /* leave space for topbar */
+    min-height:100vh;
+  }
+
+  .page.active {
+    display:block;
+  }
+
+  /* Game Grid */
+  #gamePage .game-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap:15px;
+    padding:20px;
+  }
+
+  .game-card {
+    position:relative;
+    width:100%;
+    padding-top:100%; /* square */
+    overflow:hidden;
+    cursor:pointer;
+    border-radius:10px;
+  }
+
+  .game-card img {
+    position:absolute;
+    top:0; left:0; width:100%; height:100%;
+    object-fit:cover;
+    transition: transform 0.3s;
+  }
+
+  .game-card:hover img {
+    transform: scale(1.05);
+  }
+
+  .game-overlay {
+    position:absolute;
+    top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5);
+    color:#fff;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-direction:column;
+    padding:10px;
+    opacity:0;
+    transition: opacity 0.3s;
+  }
+
+  .game-card:hover .game-overlay {
+    opacity:1;
+  }
+
+  .game-overlay .name {
+    font-weight:bold;
+  }
+
+  .game-overlay .star {
+    font-size:24px;
+    cursor:pointer;
+  }
+
+  /* Home Page Buttons */
+  #homePage .home-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap:15px;
+    padding:20px;
+  }
+
+  .home-button {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    background:rgba(255,255,255,0.2);
+    padding:20px;
+    border-radius:10px;
+    cursor:pointer;
+    transition: transform 0.2s, background 0.3s;
+  }
+
+  .home-button:hover {
+    transform: scale(1.05);
+    background:rgba(255,255,255,0.4);
+  }
+
+  .home-button img {
+    width:50px;
+    height:50px;
+    margin-bottom:5px;
+  }
+
+  /* Search Page */
+  #searchPage {
+    padding:20px;
+  }
+
+  #searchBox {
+    display:flex;
+    flex-direction:column;
+    max-width:500px;
+    margin-bottom:20px;
+  }
+
+  #searchBox input {
+    padding:10px;
+    font-size:16px;
+    border-radius:5px;
+    border:none;
+    outline:none;
+  }
+
+  #searchResults {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap:15px;
+    margin-top:10px;
+  }
+
+  .search-item {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.2);
+    padding:10px;
+    border-radius:8px;
+  }
+
+  .search-item img {
+    width:40px;
+    height:40px;
+    object-fit:cover;
+    border-radius:5px;
+  }
+
+  #recentFavorites {
+    margin-top:30px;
+  }
+
+  #recentFavorites h3 {
+    margin-bottom:10px;
+  }
+
+  .favorites-list, .recent-list {
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .fav-card {
+    width:80px;
+    height:80px;
+    position:relative;
+  }
+
+  .fav-card img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:5px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div id="topbar">
+  <div class="buttons">
+    <img src="https://via.placeholder.com/40?text=G" alt="Game" id="gameBtn">
+    <img src="https://via.placeholder.com/40?text=H" alt="Home" id="homeBtn">
+    <img src="https://via.placeholder.com/40?text=S" alt="Search" id="searchBtn">
+  </div>
+  <div class="logo">
+    <img src="https://savnaclive.github.io/savnac/images/logo.png" alt="Logo">
+  </div>
+</div>
+
+<!-- Pages -->
+
+<!-- Game Page -->
+<div class="page active" id="gamePage">
+  <div class="game-grid" id="gameGrid">
+    <!-- Game cards dynamically injected -->
+  </div>
+</div>
+
+<!-- Home Page -->
+<div class="page" id="homePage">
+  <div class="home-grid" id="homeGrid">
+    <!-- Example buttons -->
+    <div class="home-button" id="themeToggle">
+      <img src="https://via.placeholder.com/50?text=☀️/🌙" alt="Theme">
+      <span>Toggle Light/Dark</span>
+    </div>
+    <div class="home-button">
+      <img src="https://via.placeholder.com/50" alt="Button">
+      <span>Example Button 1</span>
+    </div>
+    <div class="home-button">
+      <img src="https://via.placeholder.com/50" alt="Button">
+      <span>Example Button 2</span>
+    </div>
+  </div>
+</div>
+
+<!-- Search Page -->
+<div class="page" id="searchPage">
+  <div id="searchBox">
+    <input type="text" id="searchInput" placeholder="Search games...">
+    <div id="searchResults"></div>
+  </div>
+
+  <div id="recentFavorites">
+    <h3>Recently Played</h3>
+    <div class="recent-list" id="recentList"></div>
+
+    <h3>Favorites</h3>
+    <div class="favorites-list" id="favoritesList"></div>
+  </div>
+</div>
+
+<script>
+  // ================== Data ==================
+  const games = [
+    {name:"1v1.lol", url:"1v1lol.html", img:"https://img.utdstc.com/icon/983/22a/98322a3b2be892eed31589906ffd949b68bcccc9a21ba562987965b5ec6bc6de:200"},
+    {name:"2048", url:"2048.html", img:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/95/8e/c3/958ec36e-06b1-0897-53b3-c968234bf47f/AppIcon-0-0-1x_U007emarketing-0-6-85-220.png/512x512bb.jpg"},
+    {name:"A Small World Cup", url:"aswc.html", img:"https://play-lh.googleusercontent.com/R47kNu-wEYMVnoo7rFOXiAHoBvW26KHps65Oi0S6zMF722x0LYqHJUiXRvB_xhsj0CM"},
+    {name:"Amazing Strange Rope Police", url:"asrp.html", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZDCGdZc8f2TLbgcv4aULu8Gf4_D3qwe6eiPo8mDGxn3jL3GpWzsquaflVA800tU2hl5I"},
+    {name:"Among Us", url:"amongus.html", img:"https://images.sftcdn.net/images/t_app-icon-m/p/d10217b5-1ae1-44dd-a82c-6e2d60d086d6/3969265935/among-us-Download-Among-Us.jpg"},
+    {name:"Bacon May Die", url:"baconmaydie.html", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlgNyBQroC5JSJh1gOrStxprpzi0u95828vA&s"},
+    {name:"Basket Random", url:"basketrandom.html", img:"https://geometrydash2.com/data/image/basket-random.jpg"},
+    {name:"Bit Planes", url:"bitplanes.html", img:"https://images.rocketgames.io/uploads/games/b/bit-planes/bit-planes.16800f.jpg"},
+    {name:"Bitlife", url:"bitlife.html", img:"https://play-lh.googleusercontent.com/fUM-UyywXxjC8soxAZdIlxJrlRRXmql8wkE426SHzft4lJycSKVd2jCYQQX1BEG9Xw"},
+    {name:"Block Blast", url:"blockblast.html", img:"https://camo.githubusercontent.com/fed5c30c2eaffc5f8ad4d5198cc3da233226d58502ac973784459ad42bd10af1/68747470733a2f2f626c6f636b626c6173742e6465762f66617669636f6e2e706e67"},
+    {name:"Bloons TD", url:"bloonstd.html", img:"https://play-lh.googleusercontent.com/4te8y2It_nyY4yX5jcSEFaTDro98302l9EnSbkJyCobGUo8GWxteV_8kJ8nlXyStxw"}
+  ];
+
+  // ================== Theme ==================
+  const body = document.body;
+  const storedTheme = localStorage.getItem('theme');
+  if(storedTheme) {
+    body.classList.add(storedTheme);
+  } else {
+    body.classList.add('light');
+  }
+
+  function toggleTheme() {
+    if(body.classList.contains('light')) {
+      body.classList.replace('light','dark');
+      localStorage.setItem('theme','dark');
+    } else {
+      body.classList.replace('dark','light');
+      localStorage.setItem('theme','light');
+    }
+  }
+
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+  // ================== Page Switching ==================
+  const pages = {game:document.getElementById('gamePage'), home:document.getElementById('homePage'), search:document.getElementById('searchPage')};
+
+  document.getElementById('gameBtn').addEventListener('click',()=>showPage('game'));
+  document.getElementById('homeBtn').addEventListener('click',()=>showPage('home'));
+  document.getElementById('searchBtn').addEventListener('click',()=>showPage('search'));
+
+  function showPage(page){
+    for(let p in pages){ pages[p].classList.remove('active'); }
+    pages[page].classList.add('active');
+  }
+
+  // ================== Game Grid ==================
+  const gameGrid = document.getElementById('gameGrid');
+  const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+  const recentPlayed = JSON.parse(localStorage.getItem('recentPlayed')) || [];
+
+  function renderGames(){
+    gameGrid.innerHTML = '';
+    games.forEach(game=>{
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      const img = document.createElement('img');
+      img.src = game.img;
+      card.appendChild(img);
+
+      const overlay = document.createElement('div');
+      overlay.className='game-overlay';
+
+      const name = document.createElement('div');
+      name.className='name';
+      name.textContent = game.name;
+
+      const star = document.createElement('div');
+      star.className='star';
+      star.innerHTML = favorites.includes(game.name)?'★':'☆';
+      star.addEventListener('click',(e)=>{
+        e.stopPropagation();
+        toggleFavorite(game.name, star);
+      });
+
+      overlay.appendChild(name);
+      overlay.appendChild(star);
+      card.appendChild(overlay);
+
+      card.addEventListener('click',()=>{
+        window.location.href = game.url;
+        addRecent(game.name);
+      });
+
+      gameGrid.appendChild(card);
+    });
+  }
+
+  function toggleFavorite(name, starEl){
+    const idx = favorites.indexOf(name);
+    if(idx===-1){
+      favorites.push(name);
+      starEl.innerHTML='★';
+    } else {
+      favorites.splice(idx,1);
+      starEl.innerHTML='☆';
+    }
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    renderFavorites();
+  }
+
+  function addRecent(name){
+    if(recentPlayed.includes(name)){
+      recentPlayed.splice(recentPlayed.indexOf(name),1);
+    }
+    recentPlayed.unshift(name);
+    if(recentPlayed.length>10) recentPlayed.pop();
+    localStorage.setItem('recentPlayed', JSON.stringify(recentPlayed));
+    renderFavorites();
+  }
+
+  renderGames();
+
+  // ================== Favorites & Recent ==================
+  const favoritesList = document.getElementById('favoritesList');
+  const recentList = document.getElementById('recentList');
+
+  function renderFavorites(){
+    favoritesList.innerHTML='';
+    recentList.innerHTML='';
+
+    favorites.forEach(name=>{
+      const game = games.find(g=>g.name===name);
+      if(game){
+        const div = document.createElement('div');
+        div.className='fav-card';
+        const img = document.createElement('img');
+        img.src=game.img;
+        div.appendChild(img);
+        favoritesList.appendChild(div);
+      }
+    });
+
+    recentPlayed.forEach(name=>{
+      const game = games.find(g=>g.name===name);
+      if(game){
+        const div = document.createElement('div');
+        div.className='fav-card';
+        const img = document.createElement('img');
+        img.src=game.img;
+        div.appendChild(img);
+        recentList.appendChild(div);
+      }
+    });
+  }
+
+  renderFavorites();
+
+  // ================== Search ==================
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+
+  searchInput.addEventListener('input',()=>{
+    const query = searchInput.value.toLowerCase();
+    searchResults.innerHTML='';
+    const filtered = games.filter(g=>g.name.toLowerCase().includes(query));
+    filtered.forEach(game=>{
+      const div = document.createElement('div');
+      div.className='search-item';
+      const img = document.createElement('img');
+      img.src=game.img;
+      const span = document.createElement('span');
+      span.textContent = game.name;
+      div.appendChild(img);
+      div.appendChild(span);
+      div.addEventListener('click',()=>{ window.location.href = game.url; addRecent(game.name); });
+      searchResults.appendChild(div);
+    });
+  });
+
+</script>
+</body>
+</html>

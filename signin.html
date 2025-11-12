@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+    .container {
+      background: #fff; padding: 2em; max-width: 400px; margin: 50px auto;
+      border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, textarea { width: 100%; margin-bottom: 1em; padding: 0.5em; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #28a745; color: #fff; border: none; padding: 0.7em 1.5em; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #218838; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Feedback</h2>
+    <input type="text" id="name" placeholder="Your Name" required>
+    <textarea id="feedback" rows="5" placeholder="Your Feedback" required></textarea>
+    <button onclick="sendFeedback()">Send Feedback</button>
+  </div>
+  <script>
+    function sendFeedback() {
+      const name = document.getElementById('name').value.trim();
+      const feedback = document.getElementById('feedback').value.trim();
+      if (!name || !feedback) {
+        alert('Please fill in both fields.');
+        return;
+      }
+      const subject = encodeURIComponent('Feedback from ' + name);
+      const body = encodeURIComponent(feedback);
+      const mailto = `mailto:harrison.t135@stu.nebo.edu?subject=${subject}&body=${body}`;
+      window.location.href = mailto;
+    }
+  </script>
+</body>
+</html>
