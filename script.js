@@ -1,5 +1,5 @@
 const songs = [
-  "songs/song1.mp3",
+  "songs/Godzilla-Eminem.mp3",
   "songs/song2.mp3",
   "songs/song3.mp3"
   // add all 20 here
