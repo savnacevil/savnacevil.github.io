@@ -1,203 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Music</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LiveCanvas Songs</title>
 
-  <style>
-    body {
-      margin: 0;
-      padding-bottom: 100px;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
-    }
+<style>
+body {
+  margin: 0;
+  padding-bottom: 140px; /* space for custom bar */
+  font-family: system-ui, sans-serif;
+  background: #0e0e0e;
+  color: white;
+}
 
-    h1 {
-      text-align: center;
-      margin-top: 20px;
-    }
+/* Header */
+h1 {
+  text-align: center;
+  margin: 12px 0;
+}
 
-    ul {
-      list-style: none;
-      padding: 0;
-      max-width: 500px;
-      margin: 20px auto;
-    }
+/* Search */
+#search {
+  width: 90%;
+  margin: 10px auto;
+  display: block;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  background: #1e1e1e;
+  color: white;
+  font-size: 16px;
+}
 
-    li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px;
-      border-bottom: 1px solid #333;
-    }
+/* Song list */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-    button {
-      background: #222;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #222;
+  font-size: 14px;
+}
 
-    button:hover {
-      background: #333;
-    }
+li button {
+  background: none;
+  color: #1db954;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    #player-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #000;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+/* Player bar */
+#player-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 2px solid #1db954;
+}
 
-    #now-playing {
-      flex: 1;
-      font-size: 10px;
-      opacity: 0.8;
-    }
+/* Now playing text */
+#now-playing {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    audio {
-      width: 100%;
-    }
-  </style>
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.controls button {
+  background: #1e1e1e;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Custom progress bar */
+.progress-container {
+  position: relative;
+  height: 8px;
+  background: #222;
+  border-radius: 4px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.progress {
+  height: 100%;
+  background: linear-gradient(90deg, #1db954, #00e0ff);
+  width: 0%;
+  border-radius: 4px;
+}
+
+/* Time display */
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 2px;
+}
+
+/* Audio element hidden */
+audio {
+  display: none;
+}
+</style>
 </head>
 
 <body>
 
-<h1>My Songs</h1>
+<h1>LiveCanvas</h1>
+<input id="search" placeholder="Search songs..." />
 
 <ul id="song-list"></ul>
 
 <div id="player-bar">
-  <button onclick="shuffle()">🔀</button>
   <div id="now-playing">Nothing playing</div>
-  <audio id="audio" controls></audio>
+
+  <div class="progress-container" id="progress-container">
+    <div class="progress" id="progress"></div>
+  </div>
+  <div class="time-display">
+    <span id="current-time">0:00</span>
+    <span id="duration">0:00</span>
+  </div>
+
+  <div class="controls">
+    <button id="shuffleBtn">🔀</button>
+    <button id="skipBtn">⏭</button>
+    <button id="playPauseBtn">▶</button>
+  </div>
+
+  <audio id="audio"></audio>
 </div>
 
 <script>
-  const songs = [
-    {
-      title: "Godzilla - Eminem",
-      url: "https://ia600309.us.archive.org/4/items/eminem-godzilla/Eminem-Godzilla.mp3"
-    },
-{
-  title: "Berzerk - Eminem",
-  url: "https://ia601704.us.archive.org/15/items/Berzerk-eminem/Eminem%20-%20Berzerk%20%28Clean%20%20Lyrics%29.mp3"
-},
-{
-  title: "Venom - Eminem",
-  url: "https://ia601704.us.archive.org/28/items/clean-venom-eminem/%28Clean%29%20Venom%20-%20Eminem.mp3"
-},
-{
-  title: "Till I Collapse - Eminem",
-  url: "https://ia600100.us.archive.org/20/items/till-i-collapse-clean/Till%27%20I%20Collapse%20%28clean%29.mp3"
-},
-{
-  title: "Heartless - Kanye West",
-  url: "https://ia601702.us.archive.org/11/items/heartless_202601/Heartless.mp3"
-},
-{
-  title: "Love Lockdown - Kanye West",
-  url: "https://ia600100.us.archive.org/32/items/love-lockdown_202601/Love%20Lockdown.mp3"
-},
-{
-  title: "Mustard - Kenrick Lamar",
-  url: "https://ia600600.us.archive.org/0/items/kendrick-lamar-tv-off-clean/Kendrick%20Lamar-%20TV%20OFF%28Clean%29.mp3"
-},
-{
-  title: "HUMBLE. - Kenrick Lamar",
-  url: "https://ia601703.us.archive.org/22/items/humble.-kendrick-lamar-clean/HUMBLE.%20-%20Kendrick%20Lamar%20%28Clean%29.mp3"
-},
-{
-  title: "Not like us - Kenrick Lamar",
-  url: "https://ia600801.us.archive.org/18/items/kendrick-lamar-not-like-us-clean_202601/Kendrick%20Lamar%20-%20Not%20Like%20Us%20%5BClean%5D.mp3"
-},
-{
-  title: "God's Plan - Drake",
-  url: "https://ia600401.us.archive.org/0/items/drake-gods-plan-clean/Drake%20-%20Gods%20Plan%20%28Clean%29.mp3"
-},
-{
-  title: "One Dance - Drake",
-  url: "https://ia600301.us.archive.org/12/items/drake-one-dance-super-clean-version/Drake%20-%20One%20Dance%20%28Super%20Clean%20Version%29.mp3"
-},
-{
-  title: "Tootsie Slide - Drake",
-  url: "https://ia601704.us.archive.org/24/items/drake-toosie-slide-clean-lyrics/Drake%20-%20Toosie%20Slide%20%28Clean%20-%20Lyrics%29.mp3"
-},
-{
-  title: "MILLION DOLLAR BABY - Tommy Richman",
-  url: "https://ia600602.us.archive.org/5/items/tommy-richman-million-dollar-baby-clean/Tommy%20Richman%20-%20MILLION%20DOLLAR%20BABY%20%28CLEAN%29.mp3"
-},
-{
-  title: "Butterfly Effect - Travis Scott",
-  url: "https://ia601706.us.archive.org/30/items/butterfly-effect-clean/Butterfly%20effect%20%28clean%29.mp3"
-},
-{
-  title: "FE!N - Travis Scott",
-  url: "https://ia600600.us.archive.org/32/items/travis-scott-fe-n-clean-lyrics-feat.-playboi-carti/Travis%20Scott%20-%20FE%21N%20%28Clean%20-%20Lyrics%29%20feat.%20Playboi%20Carti.mp3"
-},
-{
-  title: "Goosebumps - Travis Scott",
-  url: "https://ia600103.us.archive.org/2/items/travis-scott-sicko-mode-clean-lyrics-ft.-drake/Travis%20Scott%20-%20SICKO%20MODE%20%28Clean%20-%20Lyrics%29%20ft.%20Drake.mp3"
-},
-{
-  title: "Lucid Dream - Juice WRLD",
-  url: "https://ia600400.us.archive.org/21/items/juice-wrld-lucid-dreams-clean-lyrics/Juice%20WRLD%20-%20Lucid%20Dreams%20%28Clean%20Lyrics%29.mp3"
-},
-{
-  title: "Wishing Well - Juice WRLD",
-  url: "https://ia601408.us.archive.org/6/items/juice-wrld-wishing-well-clean-lyrics/Juice%20WRLD%20-%20Wishing%20Well%20%28Clean%20-%20Lyrics%29.mp3"
-},
-{
-  title: "Robbery - Juice WRLD",
-  url: "https://ia801706.us.archive.org/21/items/juice-wrld-robbery-clean-lyrics/Juice%20WRLD%20-%20Robbery%20%28Clean%20-%20Lyrics%29.mp3"
-},
-{
-  title: "Sky - Playboi Carti",
-  url: "https://ia600402.us.archive.org/27/items/playboi-carti-sky-clean/Playboi%20Carti%20-%20Sky%20%28CLEAN%29.mp3"
+const songs = [
+  { title: "Godzilla - Eminem", url: "https://ia600309.us.archive.org/4/items/eminem-godzilla/Eminem-Godzilla.mp3" },
+  { title: "Berzerk - Eminem", url: "https://ia601704.us.archive.org/15/items/Berzerk-eminem/Eminem%20-%20Berzerk%20%28Clean%20%20Lyrics%29.mp3" },
+  { title: "Venom - Eminem", url: "https://ia601704.us.archive.org/28/items/clean-venom-eminem/%28Clean%29%20Venom%20-%20Eminem.mp3" },
+  { title: "Till I Collapse - Eminem", url: "https://ia600100.us.archive.org/20/items/till-i-collapse-clean/Till%27%20I%20Collapse%20%28clean%29.mp3" },
+  { title: "Stan - Eminem", url: "https://ia600800.us.archive.org/3/items/clean-version-eminem-ft.-dido-stan/%28Clean%20Version%29%20Eminem%20ft.%20Dido-%20Stan.mp3" },
+  { title: "Heartless - Kanye West", url: "https://ia601702.us.archive.org/11/items/heartless_202601/Heartless.mp3" },
+  { title: "Love Lockdown - Kanye West", url: "https://ia600100.us.archive.org/32/items/love-lockdown_202601/Love%20Lockdown.mp3" },
+  { title: "Mustard - Kendrick Lamar", url: "https://ia600600.us.archive.org/0/items/kendrick-lamar-tv-off-clean/Kendrick%20Lamar-%20TV%20OFF%28Clean%29.mp3" },
+  { title: "HUMBLE. - Kendrick Lamar", url: "https://ia601703.us.archive.org/22/items/humble.-kendrick-lamar-clean/HUMBLE.%20-%20Kendrick%20Lamar%20%28Clean%29.mp3" },
+  { title: "Not Like Us - Kendrick Lamar", url: "https://ia600801.us.archive.org/18/items/kendrick-lamar-not-like-us-clean_202601/Kendrick%20Lamar%20-%20Not%20Like%20Us%20%5BClean%5D.mp3" },
+  { title: "God's Plan - Drake", url: "https://ia600401.us.archive.org/0/items/drake-gods-plan-clean/Drake%20-%20Gods%20Plan%20%28Clean%29.mp3" },
+  { title: "One Dance - Drake", url: "https://ia600301.us.archive.org/12/items/drake-one-dance-super-clean-version/Drake%20-%20One%20Dance%20%28Super%20Clean%20Version%29.mp3" },
+  { title: "Tootsie Slide - Drake", url: "https://ia601704.us.archive.org/24/items/drake-toosie-slide-clean-lyrics/Drake%20-%20Toosie%20Slide%20%28Clean%20-%20Lyrics%29.mp3" },
+  { title: "MILLION DOLLAR BABY - Tommy Richman", url: "https://ia600602.us.archive.org/5/items/tommy-richman-million-dollar-baby-clean/Tommy%20Richman%20-%20MILLION%20DOLLAR%20BABY%20%28CLEAN%29.mp3" },
+  { title: "Butterfly Effect - Travis Scott", url: "https://ia601706.us.archive.org/30/items/butterfly-effect-clean/Butterfly%20effect%20%28clean%29.mp3" },
+  { title: "FE!N - Travis Scott", url: "https://ia600600.us.archive.org/32/items/travis-scott-fe-n-clean-lyrics-feat.-playboi-carti/Travis%20Scott%20-%20FE%21N%20%28Clean%20-%20Lyrics%29%20feat.%20Playboi%20Carti.mp3" },
+  { title: "Goosebumps - Travis Scott", url: "https://ia600103.us.archive.org/2/items/travis-scott-sicko-mode-clean-lyrics-ft.-drake/Travis%20Scott%20-%20SICKO%20MODE%20%28Clean%20-%20Lyrics%29%20ft.%20Drake.mp3" },
+  { title: "Lucid Dream - Juice WRLD", url: "https://ia600400.us.archive.org/21/items/juice-wrld-lucid-dreams-clean-lyrics/Juice%20WRLD%20-%20Lucid%20Dreams%20%28Clean%20Lyrics%29.mp3" },
+  { title: "Wishing Well - Juice WRLD", url: "https://ia601408.us.archive.org/6/items/juice-wrld-wishing-well-clean-lyrics/Juice%20WRLD%20-%20Wishing%20Well%20%28Clean%20-%20Lyrics%29.mp3" },
+  { title: "Robbery - Juice WRLD", url: "https://ia801706.us.archive.org/21/items/juice-wrld-robbery-clean-lyrics/Juice%20WRLD%20-%20Robbery%20%28Clean%20-%20Lyrics%29.mp3" },
+  { title: "Sky - Playboi Carti", url: "https://ia600402.us.archive.org/27/items/playboi-carti-sky-clean/Playboi%20Carti%20-%20Sky%20%28CLEAN%29.mp3" }
+];
+
+const audio = document.getElementById("audio");
+const songList = document.getElementById("song-list");
+const nowPlaying = document.getElementById("now-playing");
+const search = document.getElementById("search");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const skipBtn = document.getElementById("skipBtn");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const progress = document.getElementById("progress");
+const progressContainer = document.getElementById("progress-container");
+const currentTimeEl = document.getElementById("current-time");
+const durationEl = document.getElementById("duration");
+
+let currentIndex = -1;
+let shuffleMode = false;
+
+/* PLAY SONG */
+function playSong(i) {
+  currentIndex = i;
+  audio.src = songs[i].url;
+  audio.play();
+  nowPlaying.textContent = songs[i].title;
+  playPauseBtn.textContent = "⏸";
 }
-  ];
 
-  const audio = document.getElementById("audio");
-  const songList = document.getElementById("song-list");
-  const nowPlaying = document.getElementById("now-playing");
+/* RANDOM INDEX */
+function getRandomIndex() {
+  if (songs.length === 1) return 0;
+  let i;
+  do { i = Math.floor(Math.random() * songs.length); }
+  while (i === currentIndex);
+  return i;
+}
 
-  let currentIndex = 0;
+/* TOGGLE SHUFFLE */
+shuffleBtn.onclick = () => {
+  shuffleMode = !shuffleMode;
+  shuffleBtn.textContent = shuffleMode ? "🔀 ON" : "🔀 OFF";
+  playSong(getRandomIndex());
+}
 
-  function playSong(index) {
-    currentIndex = index;
-    audio.src = songs[index].url;
+/* SKIP SONG */
+skipBtn.onclick = () => {
+  if (shuffleMode) playSong(getRandomIndex());
+  else playSong((currentIndex + 1) % songs.length);
+}
+
+/* PLAY/PAUSE */
+playPauseBtn.onclick = () => {
+  if (audio.paused) {
     audio.play();
-    nowPlaying.textContent = " " + songs[index].title;
+    playPauseBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playPauseBtn.textContent = "▶";
   }
+}
 
-  function shuffle() {
-    const randomIndex = Math.floor(Math.random() * songs.length);
-    playSong(randomIndex);
+/* SONG ENDS */
+audio.onended = () => {
+  if (shuffleMode) playSong(getRandomIndex());
+  else playSong((currentIndex + 1) % songs.length);
+}
+
+/* UPDATE PROGRESS */
+audio.ontimeupdate = () => {
+  if (audio.duration) {
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progress.style.width = percent + "%";
+
+    // Format time
+    const cMinutes = Math.floor(audio.currentTime / 60);
+    const cSeconds = Math.floor(audio.currentTime % 60).toString().padStart(2, "0");
+    const dMinutes = Math.floor(audio.duration / 60);
+    const dSeconds = Math.floor(audio.duration % 60).toString().padStart(2, "0");
+    currentTimeEl.textContent = `${cMinutes}:${cSeconds}`;
+    durationEl.textContent = `${dMinutes}:${dSeconds}`;
   }
+}
 
-  audio.addEventListener("ended", () => {
-    currentIndex = (currentIndex + 1) % songs.length;
-    playSong(currentIndex);
-  });
+/* CLICK PROGRESS TO SEEK */
+progressContainer.onclick = (e) => {
+  const width = progressContainer.clientWidth;
+  const clickX = e.offsetX;
+  const newTime = (clickX / width) * audio.duration;
+  audio.currentTime = newTime;
+}
 
-  // build song list
-  songs.forEach((song, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <span>${song.title}</span>
-      <button onclick="playSong(${index})">Play</button>
-    `;
-    songList.appendChild(li);
+/* RENDER SONG LIST */
+function renderSongs(filter = "") {
+  songList.innerHTML = "";
+  songs.forEach((song, i) => {
+    if (song.title.toLowerCase().includes(filter.toLowerCase())) {
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${song.title}</span><button onclick="playSong(${i})">▶</button>`;
+      songList.appendChild(li);
+    }
   });
+}
+
+search.addEventListener("input", e => renderSongs(e.target.value));
+renderSongs();
 </script>
 
 </body>
