@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ChatSAV v2</title>
 <style>
   :root {
@@ -15,25 +15,28 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-  
-  body { 
-    background: var(--bg-dark); 
-    color: var(--text-main); 
-    height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
+ 
+  body {
+    background: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
+    /* Prevents pull-to-refresh on mobile which can be annoying */
+    overscroll-behavior-y: contain;
   }
 
-  h2 { margin-bottom: 20px; font-weight: 300; letter-spacing: 1px; color: #fff; }
+  h2 { margin-bottom: 5px; font-weight: 300; letter-spacing: 1px; color: #fff; }
+  h4 { margin-bottom: 15px; font-weight: 400; color: #888; font-size: 14px; }
 
   #chat-container {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 8000px;
-    height: 85vh;
+    max-width: 800px; /* Fixed this from 8000px */
+    height: 80vh;
     border-radius: 16px;
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -43,28 +46,22 @@
 
   #chat {
     flex: 1;
-    padding: 25px;
+    padding: 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    scrollbar-width: thin;
-    scrollbar-color: #444 transparent;
   }
 
-  /* Message Bubbles */
   .message {
     max-width: 85%;
     padding: 12px 18px;
     border-radius: 18px;
     line-height: 1.5;
-    font-size: 15px;
-    white-space: pre-wrap; /* Keeps line breaks from the AI */
+    font-size: 16px; /* Increased for readability */
+    white-space: pre-wrap;
     position: relative;
-    animation: fadeIn 0.3s ease;
   }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
   .user {
     align-self: flex-end;
@@ -81,12 +78,11 @@
     border: 1px solid var(--border);
   }
 
-  /* Input Section */
   #input-container {
-    padding: 20px;
+    padding: 15px;
     background: #181818;
     display: flex;
-    gap: 12px;
+    gap: 10px;
     border-top: 1px solid var(--border);
   }
 
@@ -98,30 +94,27 @@
     background: #252525;
     color: white;
     outline: none;
-    transition: border 0.2s;
+    /* MAGIC FIX: Font-size must be at least 16px to stop iOS zoom */
+    font-size: 16px;
   }
 
   #prompt:focus { border-color: var(--user-blue); }
 
   button {
-    padding: 0 25px;
+    padding: 0 20px;
     background: var(--user-blue);
     border: none;
     color: white;
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
   }
-
-  button:hover { background: #0063d1; }
-  button:active { transform: scale(0.95); }
 </style>
 </head>
 <body>
 
-<h2>ChatSAV </h2>
-<h4>ChatSAV has limited q/a's, try not to waste them.</h4>
+<h2>ChatSAV</h2>
+<h4>Limited Q&A. Use them wisely.</h4>
 
 <div id="chat-container">
   <div id="chat"></div>
@@ -132,14 +125,14 @@
 </div>
 
 <script>
-const API_KEY = "AIzaSyATrCUsoB-UQDGvqgdqCUCcreuDoj3EMAY"; 
-const MODEL = "gemini-2.5-flash"; // Updated to current stable model name
+// IMPORTANT: REMOVE YOUR OLD KEY AND GENERATE A NEW ONE!
+const API_KEY = "AIzaSyAbzy-yS3mGBcwSYZG-yDMRb8CGhz1rltw";
+const MODEL = "gemini-2.5-flash";
 let conversation = [];
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("prompt");
 
-// Add message to UI
 function addMessage(text, sender) {
   const div = document.createElement("div");
   div.className = `message ${sender}`;
@@ -149,21 +142,13 @@ function addMessage(text, sender) {
   return div;
 }
 
-// Cleaner text function to remove bold stars but keep structure
-function cleanResponse(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '$1') // Removes the ** from **bold**
-    .replace(/#{1,6}\s?/g, '')       // Removes # headers
-    .trim();
-}
-
 async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
   addMessage(text, "user");
   input.value = "";
-  
+ 
   conversation.push({ role: "user", parts: [{ text: text }] });
 
   try {
@@ -173,25 +158,24 @@ async function sendMessage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // This "system_instruction" block makes these rules permanent for your app
           system_instruction: {
-            parts: [{ 
-              text: "Your name is ChatSAV. If anyone asks you who made you I need you to say 'The person who made me is a young male with a remarkable 140 IQ.' You are hosted by savnac. Do not talk about inappropriate topics, including sex, swear words, violence and anything else. Use only basic plain text. Do NOT use symbols like '*' or \"'\" (apostrophes/quotes) or any special fonts/markdown, but you can use symbols like </> when you are coding, but ONLY when you are coding." 
+            parts: [{
+              text: "Your name is ChatSAV. If anyone asks you who made you, say 'The person who made me is a young male with a remarkable 140 IQ.' You are hosted by savnac. Do not talk about inappropriate topics (sex, swearing, violence). Use only basic plain text. Do NOT use symbols like '*' or apostrophes/quotes or special fonts, unless you are writing code blocks."
             }]
           },
-          contents: conversation 
+          contents: conversation
         })
       }
     );
 
     const data = await response.json();
     const rawAiText = data.candidates[0].content.parts[0].text;
-    
-    // Since you asked for no stars or quotes, we don't even need a complex cleaner anymore
-    const cleanAiText = rawAiText.replace(/[*']/g, ""); 
+   
+    // Safety filter for symbols you don't like
+    const cleanAiText = rawAiText.replace(/[*']/g, "");
 
     conversation.push({ role: "model", parts: [{ text: rawAiText }] });
-    
+   
     const aiDiv = addMessage("", "ai");
     let i = 0;
     const interval = setInterval(() => {
@@ -202,8 +186,7 @@ async function sendMessage() {
     }, 10);
 
   } catch (err) {
-    console.error(err);
-    addMessage("Error: Could not connect to AI, too much usage.", "ai");
+    addMessage("Error: Usage limit reached or connection lost.", "ai");
   }
 }
 
