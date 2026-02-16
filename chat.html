@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Savnac Discord v6.0 (Joinable Rooms)</title>
+<title>savnac chat v6.0 (Joinable Rooms)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -22,17 +22,27 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { margin: 0; padding: 0; background: var(--bg-3); color: var(--text); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; display: flex; position: fixed; width: 100%; }
 
-/* Mobile Menu Toggle */
+/* Login Overlay */
+#loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 31, 34, 0.8); backdrop-filter: blur(8px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.login-card { background: var(--bg-2); padding: 32px; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); text-align: center; }
+.login-card h2 { color: #fff; margin-bottom: 8px; }
+.login-card p { color: #b5bac1; font-size: 0.9rem; margin-bottom: 20px; }
+.login-card input { width: 100%; background: #1e1f22; border: none; padding: 12px; border-radius: 4px; color: #fff; font-size: 16px !important; margin-bottom: 10px; outline: none; }
+.login-card button { width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.login-card button:hover { background: #4752c4; }
+#loginError { color: var(--danger); font-size: 0.8rem; margin-top: 10px; min-height: 1.2rem; }
+
+/* Main App hidden until login */
+#app { display: none; width: 100%; height: 100%; }
+
 .mobile-menu-toggle { display: none; font-size: 1.5rem; color: #80848e; cursor: pointer; margin-right: 10px; }
 
-/* 1. Server Rail */
 .server-rail { width: 72px; background: var(--bg-1); display: flex; flex-direction: column; align-items: center; padding-top: 12px; flex-shrink: 0; }
 .server-icon { width: 48px; height: 48px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
 .server-icon:hover { border-radius: 16px; }
 .server-icon.v-server { background: #43b581; } 
 .nuke-btn { margin-top: auto; margin-bottom: 20px; width: 48px; height: 48px; background: var(--bg-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 0.7rem; font-weight: bold; cursor: pointer; text-align: center; border: 2px solid var(--bg-1); }
 
-/* 2. Sidebar */
 .sidebar { width: 240px; background: var(--bg-2); display: flex; flex-direction: column; border-right: 1px solid #1e1f22; flex-shrink: 0; }
 .sidebar-header { height: 48px; border-bottom: 1px solid #1f2023; display: flex; align-items: center; padding: 0 16px; font-weight: bold; color: #fff; }
 .channel-list { padding: 10px 8px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -45,11 +55,9 @@ body { margin: 0; padding: 0; background: var(--bg-3); color: var(--text); font-
 .channel::before { content: "#"; font-size: 1.2rem; color: #80848e; }
 .locked { color: #f0b232; }
 
-/* Presence / Online List */
 .user-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; color: #949ba4; font-size: 0.9rem; }
 .status-dot { width: 10px; height: 10px; background: var(--online); border-radius: 50%; border: 2px solid var(--bg-2); }
 
-/* 3. Chat Area */
 .chat-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .chat-topbar { height: 48px; border-bottom: 1px solid #26272d; display: flex; align-items: center; padding: 0 16px; font-weight: bold; color: #fff; gap: 8px; justify-content: space-between; }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
@@ -57,54 +65,41 @@ body { margin: 0; padding: 0; background: var(--bg-3); color: var(--text); font-
 
 .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; }
 
-/* Message Styling */
-.msg-group { margin-bottom: 16px; animation: slideIn 0.2s ease; position: relative; }
-.msg-group:hover .msg-options { opacity: 1; } 
+.msg-group { margin-bottom: 16px; position: relative; }
 .msg-header { display: flex; align-items: baseline; gap: 8px; }
 .username { color: #fff; font-weight: bold; }
 .timestamp { font-size: 0.7rem; color: #949ba4; }
 .msg-content { color: var(--text); margin-top: 4px; line-height: 1.4rem; white-space: pre-wrap; word-wrap: break-word; }
 .meme { max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 6px; display: block; }
 
-/* Game Card Styles */
 .game-card { background: #1e1f22; border: 1px solid var(--accent); padding: 12px; border-radius: 8px; margin-top: 8px; display: inline-block; }
 .game-card button { background: var(--accent); border: none; color: #fff; padding: 5px 15px; border-radius: 4px; margin-top: 10px; cursor: pointer; font-weight: bold; }
 .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 15px; }
 .ttt-cell { width: 60px; height: 60px; background: var(--bg-1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; border-radius: 4px; }
 
-/* Message Options Dropdown */
-.msg-options { position: absolute; top: 0; right: 0; padding: 4px 8px; color: #b5bac1; cursor: pointer; font-size: 1.2rem; opacity: 0; transition: 0.2s; }
-.menu-dropdown { position: absolute; top: 20px; right: 0; background: #111214; border-radius: 4px; padding: 6px; z-index: 50; display: none; box-shadow: 0 5px 10px rgba(0,0,0,0.3); border: 1px solid #1e1f22; width: 100px; }
-.menu-item { padding: 6px; color: #dbdee1; font-size: 0.8rem; cursor: pointer; }
+.msg-options { position: absolute; top: 0; right: 0; padding: 4px 8px; color: #b5bac1; cursor: pointer; font-size: 1.2rem; transition: 0.2s; z-index: 10; }
+.menu-dropdown { position: absolute; top: 25px; right: 0; background: #111214; border-radius: 4px; padding: 6px; z-index: 50; display: none; box-shadow: 0 5px 10px rgba(0,0,0,0.3); border: 1px solid #1e1f22; width: 100px; }
+.menu-item { padding: 8px; color: #dbdee1; font-size: 0.8rem; cursor: pointer; }
+.menu-item:hover { background: var(--accent); }
 
-/* Input - Mobile Protected */
 .input-area { padding: 0 16px 24px; position: relative; }
 .input-box { background: var(--bg-4); border-radius: 8px; padding: 0 12px; height: 44px; display: flex; align-items: center; gap: 10px; }
-input { background: transparent; border: none; color: #fff; font-family: inherit; outline: none; font-size: 16px !important; } /* CRITICAL: 16px prevents zoom */
-#usernameInput { width: 80px; font-weight: bold; color: var(--accent); border-right: 1px solid #4e5058; }
+input { background: transparent; border: none; color: #fff; font-family: inherit; outline: none; font-size: 16px !important; }
+#usernameInput { width: 80px; font-weight: bold; color: var(--accent); border-right: 1px solid #4e5058; pointer-events: none; }
 #messageInput { flex: 1; }
 
-/* REPLY BAR */
 .reply-bar { background: #2b2d31; color: #b5bac1; font-size: 0.85rem; padding: 8px 16px; border-radius: 8px 8px 0 0; display: none; align-items: center; justify-content: space-between; margin-bottom: -5px; border: 1px solid #383a40; border-bottom: none; }
 
-/* MODALS */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; }
 .modal { background: #313338; padding: 24px; border-radius: 5px; width: 90%; max-width: 320px; text-align: center; }
 .modal input { width: 100%; background: #1e1f22; padding: 12px; border-radius: 3px; margin: 15px 0; color: white; border: 1px solid transparent; font-size: 16px !important; }
 
-/* MOBILE RESPONSIVE OVERRIDES */
 @media (max-width: 768px) {
   .mobile-menu-toggle { display: block; }
-  .server-rail, .sidebar { 
-    position: absolute; 
-    z-index: 1000; 
-    height: 100%; 
-    transition: transform 0.3s ease;
-  }
+  .server-rail, .sidebar { position: absolute; z-index: 1000; height: 100%; transition: transform 0.3s ease; }
   .server-rail { left: 0; transform: translateX(-312px); }
   .sidebar { left: 72px; transform: translateX(-312px); }
   body.menu-open .server-rail, body.menu-open .sidebar { transform: translateX(0); }
-  .msg-options { opacity: 1; }
 }
 
 blockquote { margin: 4px 0 8px 0; padding-left: 10px; border-left: 4px solid #4e5058; color: #949ba4; font-size: 0.85rem; background: rgba(0,0,0,0.1); }
@@ -112,57 +107,69 @@ blockquote { margin: 4px 0 8px 0; padding-left: 10px; border-left: 4px solid #4e
 </head>
 <body id="mainBody">
 
-<div class="server-rail">
-    <div class="server-icon" onclick="switchServer('S')">S</div>
-    <div class="server-icon v-server" onclick="switchServer('V')">V</div>
-    <div class="nuke-btn" onclick="openModal('nuke')">DEL</div>
-</div>
-
-<div class="sidebar">
-    <div class="sidebar-header" id="sidebarHeader">savchat (beta v2.7)</div>
-    <div class="channel-list">
-        <div class="category">Who's Online</div>
-        <div id="presenceList"></div>
-        <div id="channelGroups">
-            <div id="s-channels">
-                <div class="category">Public Channels</div>
-                <div class="channel active" onclick="changeChannel('general')">general</div>
-                <div class="channel" onclick="changeChannel('game requests')">game requests</div>
-                <div class="channel" onclick="changeChannel('updates')">updates to savnac</div>
-                <div class="channel" onclick="changeChannel('game urls')">game urls</div>
-                <div class="category">Joinable Rooms <span class="add-room-btn" onclick="openModal('joinRoom')">+</span></div>
-                <div id="dynamicChannels"></div>
-                <div class="category">Private</div>
-                <div class="channel locked" onclick="attemptSecret()">private chat</div>
-            </div>
-            <div id="v-channels" style="display:none;">
-                <div class="category">VVMS Rooms</div>
-                <div class="channel" onclick="changeChannel('vvms general')">vvms general</div>
-                <div class="channel" onclick="changeChannel('vvms random')">vvms random</div>
-            </div>
-        </div>
+<div id="loginOverlay">
+    <div class="login-card">
+        <h2>savnac chat</h2>
+        <p>What's your display name?</p>
+        <input type="text" id="initialNameInput" placeholder="Enter username" maxlength="12">
+        <button id="joinBtn">Join Server</button>
+        <div id="loginError"></div>
     </div>
 </div>
 
-<div class="chat-area">
-    <div class="chat-topbar">
-        <div class="topbar-left">
-            <div class="mobile-menu-toggle" onclick="toggleMenuNav()">#</div>
-            <span id="channelNameDisplay">general</span>
-            <span style="cursor:pointer;" onclick="openModal('gameChallenge')">🎮</span>
-        </div>
-        <div class="clear-channel-btn" onclick="openModal('clearChannel')">🗑️</div>
+<div id="app">
+    <div class="server-rail">
+        <div class="server-icon" onclick="switchServer('S')">S</div>
+        <div class="server-icon v-server" onclick="switchServer('V')">V</div>
+        <div class="nuke-btn" onclick="openModal('nuke')">DEL</div>
     </div>
-    <div class="messages" id="messageFeed"></div>
-    <div id="typingDisplay" style="font-size: 0.8rem; padding: 0 16px 8px; color: #b5bac1;"></div>
-    <div class="input-area">
-        <div id="replyBar" class="reply-bar">
-            <div>Replying to <span id="replyUser">User</span></div>
-            <div onclick="cancelReply()" style="cursor:pointer">✕</div>
+
+    <div class="sidebar">
+        <div class="sidebar-header" id="sidebarHeader">savcha (v3.1)</div>
+        <div class="channel-list">
+            <div class="category">Who's Online</div>
+            <div id="presenceList"></div>
+            <div id="channelGroups">
+                <div id="s-channels">
+                    <div class="category">Public Channels</div>
+                    <div class="channel active" onclick="changeChannel('general')">general</div>
+                    <div class="channel" onclick="changeChannel('game requests')">game requests</div>
+                    <div class="channel" onclick="changeChannel('updates')">updates to savnac</div>
+                    <div class="channel" onclick="changeChannel('game urls')">game urls</div>
+                    <div class="category">Joinable Rooms <span class="add-room-btn" onclick="openModal('joinRoom')">+</span></div>
+                    <div id="dynamicChannels"></div>
+                    <div class="category">Private</div>
+                    <div class="channel locked" onclick="attemptSecret()">private chat</div>
+                </div>
+                <div id="v-channels" style="display:none;">
+                    <div class="category">VVMS Rooms</div>
+                    <div class="channel" onclick="changeChannel('vvms general')">vvms general</div>
+                    <div class="channel" onclick="changeChannel('vvms random')">vvms random</div>
+                </div>
+            </div>
         </div>
-        <div class="input-box">
-            <input type="text" id="usernameInput" placeholder="User" maxlength="12">
-            <input type="text" id="messageInput" placeholder="Message #general" autocomplete="off">
+    </div>
+
+    <div class="chat-area">
+        <div class="chat-topbar">
+            <div class="topbar-left">
+                <div class="mobile-menu-toggle" onclick="toggleMenuNav()">#</div>
+                <span id="channelNameDisplay">general</span>
+                <span style="cursor:pointer;" onclick="openModal('gameChallenge')">🎮</span>
+            </div>
+            <div class="clear-channel-btn" onclick="openModal('clearChannel')">🗑️</div>
+        </div>
+        <div class="messages" id="messageFeed"></div>
+        <div id="typingDisplay" style="font-size: 0.8rem; padding: 0 16px 8px; color: #b5bac1;"></div>
+        <div class="input-area">
+            <div id="replyBar" class="reply-bar">
+                <div>Replying to <span id="replyUser">User</span></div>
+                <div onclick="cancelReply()" style="cursor:pointer">✕</div>
+            </div>
+            <div class="input-box">
+                <input type="text" id="usernameInput" placeholder="User" readonly>
+                <input type="text" id="messageInput" placeholder="Message #general" autocomplete="off">
+            </div>
         </div>
     </div>
 </div>
@@ -184,10 +191,8 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnem9hZGdvdWV2amhzbmlvZ2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTMyMTgsImV4cCI6MjA4NjQ4OTIxOH0.PEw4lLwyoHHfu7zGQIt-YuLiQdMsBs7GbVh36AgSK4g"
 )
 
-// Mobile Helper
 window.toggleMenuNav = () => document.getElementById('mainBody').classList.toggle('menu-open');
 
-// ALL ORIGINAL LOGIC RESTORED
 let currentChannel = "general";
 let isPrivateMode = false;
 let isAdminSession = false; 
@@ -197,47 +202,65 @@ let messageToDeleteId = null;
 let replyContext = null; 
 let activeGame = null;
 let typingTimeout;
+let onlineUsersList = new Set();
 const badWords = ['nigga','nigger','dick','shit','ass','cum','fuck','penis','vagina','bitch','slut','whore','cock','retard'];
 
 const presenceChannel = supabase.channel('online-users', { config: { presence: { key: 'user' } } });
+
 presenceChannel.on('presence', { event: 'sync' }, () => {
     const state = presenceChannel.presenceState();
     const list = document.getElementById('presenceList');
     list.innerHTML = '';
-    const users = new Set();
-    Object.values(state).forEach(presences => { presences.forEach(p => users.add(p.username)); });
-    users.forEach(user => {
+    onlineUsersList.clear();
+    Object.values(state).forEach(presences => { presences.forEach(p => onlineUsersList.add(p.username)); });
+    onlineUsersList.forEach(user => {
         const div = document.createElement('div');
         div.className = 'user-row';
         div.innerHTML = `<div class="status-dot"></div> ${user}`;
         list.appendChild(div);
     });
     updateTypingUI(state);
-}).subscribe(async (status) => {
-    if (status === 'SUBSCRIBED') {
-        const user = document.getElementById('usernameInput').value || "Guest";
-        await presenceChannel.track({ username: user, isTyping: false });
+}).subscribe();
+
+// Login Logic
+document.getElementById('joinBtn').addEventListener('click', async () => {
+    const nameInput = document.getElementById('initialNameInput').value.trim();
+    const errorDiv = document.getElementById('loginError');
+    
+    if (nameInput.length < 3) {
+        errorDiv.textContent = "Name must be at least 3 characters.";
+        return;
     }
+    
+    if (onlineUsersList.has(nameInput)) {
+        errorDiv.textContent = "That name is already currently taken!";
+        return;
+    }
+
+    // Success - Join
+    document.getElementById('usernameInput').value = nameInput;
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    
+    await presenceChannel.track({ username: nameInput, isTyping: false });
+    loadMessages();
 });
 
 function updateTypingUI(state) {
-    const me = document.getElementById('usernameInput').value || "Guest";
+    const me = document.getElementById('usernameInput').value;
+    if(!me) return;
     const typers = [];
     Object.values(state).forEach(presences => {
         presences.forEach(p => { if (p.isTyping && p.username !== me) typers.push(p.username); });
     });
     const display = document.getElementById('typingDisplay');
-    if (typers.length === 1) display.textContent = `${typers[0]} is typing...`;
-    else if (typers.length > 1) display.textContent = `Several people are typing...`;
-    else display.textContent = '';
+    display.textContent = typers.length > 0 ? (typers.length === 1 ? `${typers[0]} is typing...` : `Several people are typing...`) : '';
 }
 
 window.switchServer = (server) => {
-    const sChannels = document.getElementById('s-channels');
-    const vChannels = document.getElementById('v-channels');
-    if (server === 'S') { sChannels.style.display = 'block'; vChannels.style.display = 'none'; changeChannel('general'); }
-    else { sChannels.style.display = 'none'; vChannels.style.display = 'block'; changeChannel('vvms general'); }
-    document.getElementById('mainBody').classList.remove('menu-open');
+    document.getElementById('s-channels').style.display = server === 'S' ? 'block' : 'none';
+    document.getElementById('v-channels').style.display = server === 'V' ? 'block' : 'none';
+    changeChannel(server === 'S' ? 'general' : 'vvms general');
 }
 
 window.changeChannel = (channelName) => {
@@ -246,10 +269,7 @@ window.changeChannel = (channelName) => {
     document.getElementById('messageFeed').innerHTML = '';
     displayedMessageIds.clear(); cancelReply();
     document.getElementById('channelNameDisplay').textContent = channelName;
-    document.querySelectorAll('.channel').forEach(el => {
-        el.classList.remove('active');
-        if(el.textContent === channelName) el.classList.add('active');
-    });
+    document.querySelectorAll('.channel').forEach(el => el.classList.toggle('active', el.textContent === channelName));
     document.getElementById('mainBody').classList.remove('menu-open');
     loadMessages();
 }
@@ -323,36 +343,32 @@ function formatMessage(text) {
 }
 
 window.sendMessage = async () => {
-    const user = document.getElementById('usernameInput').value || "Guest";
+    const user = document.getElementById('usernameInput').value;
     const rawText = document.getElementById('messageInput').value.trim();
-    if(!rawText) return;
+    if(!rawText || !user) return;
     if(currentChannel === 'updates' && !isAdminSession) { openModal('admin'); return; }
-    
-    let finalContent = rawText;
-    if (replyContext) {
-        finalContent = `<blockquote><strong>${replyContext.author}</strong><br>${replyContext.text}</blockquote>${rawText}`;
-        cancelReply();
-    }
+    let finalContent = replyContext ? `<blockquote><strong>${replyContext.author}</strong><br>${replyContext.text}</blockquote>${rawText}` : rawText;
+    cancelReply();
     await supabase.from('feedback').insert([{ name: user, feedback: `${currentChannel}|${finalContent}`, private: isPrivateMode }]);
     document.getElementById('messageInput').value = '';
     loadMessages();
 }
 
-// GAMES LOGIC
 window.sendChallenge = async () => {
-    const user = document.getElementById('usernameInput').value || "Guest";
+    const user = document.getElementById('usernameInput').value;
     const opp = document.getElementById('opponentInput').value.trim();
     const gameObj = { type: 'ttt', challenger: user, opponent: opp, board: Array(9).fill(''), turn: user, over: false };
     await supabase.from('feedback').insert([{ name: user, feedback: `${currentChannel}|GAME_REQ|${JSON.stringify(gameObj)}`, private: isPrivateMode }]);
     closeModals();
 }
+
 window.openGame = (json) => {
     activeGame = JSON.parse(json);
     renderBoard(); openModal('ttt');
 }
+
 function renderBoard() {
-    const grid = document.getElementById('tttGrid');
-    grid.innerHTML = '';
+    const grid = document.getElementById('tttGrid'); grid.innerHTML = '';
     document.getElementById('gameStatus').textContent = activeGame.over ? "Game Over!" : `${activeGame.turn}'s Turn`;
     activeGame.board.forEach((cell, i) => {
         const div = document.createElement('div');
@@ -361,52 +377,61 @@ function renderBoard() {
         grid.appendChild(div);
     });
 }
+
 async function makeMove(i) {
-    const me = document.getElementById('usernameInput').value || "Guest";
+    const me = document.getElementById('usernameInput').value;
     if (activeGame.over || activeGame.board[i] !== '' || me !== activeGame.turn) return;
     activeGame.board[i] = activeGame.turn === activeGame.challenger ? 'X' : 'O';
     activeGame.turn = activeGame.turn === activeGame.challenger ? activeGame.opponent : activeGame.challenger;
-    // (Win check logic omitted for brevity but preserved in your original)
     await supabase.from('feedback').insert([{ name: me, feedback: `${currentChannel}|GAME_REQ|${JSON.stringify(activeGame)}`, private: isPrivateMode }]);
     renderBoard();
 }
 
 async function loadMessages() {
+    const me = document.getElementById('usernameInput').value;
+    if(!me) return;
     const { data, error } = await supabase.from('feedback').select('*').order('created_at', { ascending: true }).limit(100);
     if(error) return;
     const feed = document.getElementById('messageFeed');
+    
     data.forEach(msg => {
         const parts = msg.feedback.split('|');
         if (parts[0] === currentChannel && !displayedMessageIds.has(msg.id)) {
-            displayedMessageIds.add(msg.id);
+            const time = new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             const div = document.createElement('div');
             div.className = 'msg-group'; div.id = `msg-${msg.id}`;
-            const time = new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             
             if(parts[1] === 'GAME_REQ') {
                 const gameData = JSON.parse(parts[2]);
-                div.innerHTML = `<div class="msg-header"><span class="username">${msg.name}</span> <span class="timestamp">${time}</span></div>
-                    <div class="game-card"><h4>🎮 Tic Tac Toe</h4><button onclick='openGame(\`${JSON.stringify(gameData)}\`)'>Play</button></div>`;
+                if (me === gameData.challenger || me === gameData.opponent) {
+                    displayedMessageIds.add(msg.id);
+                    div.innerHTML = `<div class="msg-header"><span class="username">${msg.name}</span> <span class="timestamp">${time}</span></div>
+                        <div class="game-card"><h4>🎮 Tic Tac Toe vs ${me === gameData.challenger ? gameData.opponent : gameData.challenger}</h4>
+                        <button onclick='openGame(${JSON.stringify(parts[2])})'>Play</button></div>`;
+                    feed.appendChild(div);
+                }
             } else {
+                displayedMessageIds.add(msg.id);
                 div.innerHTML = `<div class="msg-options" onclick="toggleMsgMenu('${msg.id}')">⋮<div class="menu-dropdown" id="menu-${msg.id}">
                     <div class="menu-item" onclick="initReply('${msg.id}', '${msg.name}', '${parts.slice(1).join('|')}')">Reply</div>
                     <div class="menu-item" onclick="askDelete('${msg.id}')" style="color:var(--danger)">Delete</div></div></div>
                     <div class="msg-header"><span class="username">${msg.name}</span> <span class="timestamp">${time}</span></div>
                     <div class="msg-content">${formatMessage(parts.slice(1).join('|'))}</div>`;
+                feed.appendChild(div);
             }
-            feed.appendChild(div);
-            feed.scrollTop = feed.scrollHeight; 
+            feed.scrollTop = feed.scrollHeight;
         }
     });
 }
 
 window.toggleMsgMenu = (id) => {
+    document.querySelectorAll('.menu-dropdown').forEach(m => { if(m.id !== `menu-${id}`) m.style.display = 'none'; });
     const menu = document.getElementById(`menu-${id}`);
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 }
 
 document.getElementById('messageInput').addEventListener('input', async () => {
-    const user = document.getElementById('usernameInput').value || "Guest";
+    const user = document.getElementById('usernameInput').value;
     await presenceChannel.track({ username: user, isTyping: true });
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(async () => { await presenceChannel.track({ username: user, isTyping: false }); }, 2000);
@@ -414,8 +439,8 @@ document.getElementById('messageInput').addEventListener('input', async () => {
 
 document.getElementById('messageInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
 setInterval(loadMessages, 3000);
-loadMessages();
 </script>
 </body>
 </html>
+
 
