@@ -237,6 +237,14 @@ document.getElementById('joinBtn').addEventListener('click', async () => {
         return;
     }
 
+// Block inappropriate usernames
+const lowerName = nameInput.toLowerCase();
+if (badWords.some(word => lowerName.includes(word))) {
+    errorDiv.textContent = "That name is not allowed.";
+    return;
+}
+
+
     // Success - Join
     document.getElementById('usernameInput').value = nameInput;
     document.getElementById('loginOverlay').style.display = 'none';
