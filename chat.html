@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>savnac chat v6.2 (Admin & V-Server Fix)</title>
+<title>savnac chat v6.5 (iPhone and admin)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-1: #1e1f22; 
-  --bg-2: #2b2d31; 
-  --bg-3: #313338; 
-  --bg-4: #383a40; 
-  --text: #dbdee1;
-  --accent: #5865f2;
-  --hover: rgba(255,255,255,0.05);
-  --danger: #da373c;
-  --success: #23a559;
-  --online: #23a559;
+  --bg-1: #1e1f22; 
+  --bg-2: #2b2d31; 
+  --bg-3: #313338; 
+  --bg-4: #383a40; 
+  --text: #dbdee1;
+  --accent: #5865f2;
+  --hover: rgba(255,255,255,0.05);
+  --danger: #da373c;
+  --success: #23a559;
+  --online: #23a559;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -40,7 +40,7 @@ body { margin: 0; padding: 0; background: var(--bg-3); color: var(--text); font-
 .server-rail { width: 72px; background: var(--bg-1); display: flex; flex-direction: column; align-items: center; padding-top: 12px; flex-shrink: 0; }
 .server-icon { width: 48px; height: 48px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
 .server-icon:hover { border-radius: 16px; }
-.server-icon.v-server { background: #43b581; } 
+.server-icon.v-server { background: #43b581; } 
 .nuke-btn { margin-top: auto; margin-bottom: 20px; width: 48px; height: 48px; background: var(--bg-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 0.7rem; font-weight: bold; cursor: pointer; text-align: center; border: 2px solid var(--bg-1); }
 
 .sidebar { width: 240px; background: var(--bg-2); display: flex; flex-direction: column; border-right: 1px solid #1e1f22; flex-shrink: 0; }
@@ -61,8 +61,11 @@ body { margin: 0; padding: 0; background: var(--bg-3); color: var(--text); font-
 .chat-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .chat-topbar { height: 48px; border-bottom: 1px solid #26272d; display: flex; align-items: center; padding: 0 16px; font-weight: bold; color: #fff; gap: 8px; justify-content: space-between; }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
 .clear-channel-btn { color: #949ba4; cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
 .clear-channel-btn:hover { color: var(--danger); }
+.registry-btn { display: none; background: rgba(255, 215, 0, 0.1); border: 1px solid #FFD700; color: #FFD700; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+.registry-btn:hover { background: rgba(255, 215, 0, 0.3); }
 
 .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; }
 
@@ -74,9 +77,9 @@ body { margin: 0; padding: 0; background: var(--bg-3); color: var(--text); font-
 .meme { max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 6px; display: block; }
 
 .msg-options { position: absolute; top: 0; right: 0; padding: 4px 8px; color: #b5bac1; cursor: pointer; font-size: 1.2rem; transition: 0.2s; z-index: 10; }
-.menu-dropdown { position: absolute; top: 25px; right: 0; background: #111214; border-radius: 4px; padding: 6px; z-index: 50; display: none; box-shadow: 0 5px 10px rgba(0,0,0,0.3); border: 1px solid #1e1f22; width: 100px; }
-.menu-item { padding: 8px; color: #dbdee1; font-size: 0.8rem; cursor: pointer; }
-.menu-item:hover { background: var(--accent); }
+.menu-dropdown { position: absolute; top: 25px; right: 0; background: #111214; border-radius: 4px; padding: 6px; z-index: 50; display: none; box-shadow: 0 5px 10px rgba(0,0,0,0.3); border: 1px solid #1e1f22; width: 130px; }
+.menu-item { padding: 8px; color: #dbdee1; font-size: 0.8rem; cursor: pointer; border-radius: 3px; }
+.menu-item:hover { background: var(--bg-4); }
 
 .input-area { padding: 0 16px 24px; position: relative; }
 .input-box { background: var(--bg-4); border-radius: 8px; padding: 0 12px; height: 44px; display: flex; align-items: center; gap: 10px; }
@@ -90,92 +93,122 @@ input { background: transparent; border: none; color: #fff; font-family: inherit
 .modal { background: #313338; padding: 24px; border-radius: 5px; width: 90%; max-width: 320px; text-align: center; }
 .modal input { width: 100%; background: #1e1f22; padding: 12px; border-radius: 3px; margin: 15px 0; color: white; border: 1px solid transparent; font-size: 16px !important; }
 
+/* System Announce Block */
+.system-announce { text-align: center; padding: 12px; margin: 16px 0; background: rgba(218, 55, 60, 0.15); border: 2px solid var(--danger); border-radius: 8px; box-shadow: 0 0 15px rgba(218, 55, 60, 0.2); }
+
+/* Custom Ban Modal Styles */
+.confirm-modal { background: #313338; border-radius: 8px; padding: 20px; width: 300px; text-align: center; border: 1px solid #4e5058; }
+.confirm-buttons { display: flex; justify-content: space-around; margin-top: 20px; }
+.btn-confirm { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.btn-cancel { background: #4e5058; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
 @media (max-width: 768px) {
-  .mobile-menu-toggle { display: block; }
-  .server-rail, .sidebar { position: absolute; z-index: 1000; height: 100%; transition: transform 0.3s ease; }
-  .server-rail { left: 0; transform: translateX(-312px); }
-  .sidebar { left: 72px; transform: translateX(-312px); }
-  body.menu-open .server-rail, body.menu-open .sidebar { transform: translateX(0); }
+  .mobile-menu-toggle { display: block; }
+  .server-rail, .sidebar { position: absolute; z-index: 1000; height: 100%; transition: transform 0.3s ease; }
+  .server-rail { left: 0; transform: translateX(-312px); }
+  .sidebar { left: 72px; transform: translateX(-312px); }
+  body.menu-open .server-rail, body.menu-open .sidebar { transform: translateX(0); }
 }
 
 blockquote { margin: 4px 0 8px 0; padding-left: 10px; border-left: 4px solid #4e5058; color: #949ba4; font-size: 0.85rem; background: rgba(0,0,0,0.1); }
 </style>
-</head>
+</head> 
 <body id="mainBody">
 
 <div id="loginOverlay">
-    <div class="login-card">
-        <h2>savnac chat</h2>
-        <p>Sign in or Create Account</p>
-        <input type="text" id="initialNameInput" placeholder="Username" maxlength="12">
-        <input type="password" id="initialPinInput" placeholder="4-Digit PIN" maxlength="4" inputmode="numeric">
-        <button id="joinBtn">Enter Server</button>
-        <div id="loginError"></div>
-    </div>
+    <div class="login-card">
+        <h2>savnac chat</h2>
+        <p>Sign in or Create Account</p>
+        <input type="text" id="initialNameInput" placeholder="Username" maxlength="12">
+        <input type="password" id="initialPinInput" placeholder="4-Digit PIN" maxlength="4" inputmode="numeric">
+        <button id="joinBtn">Enter Server</button>
+        <div id="loginError"></div>
+    </div>
 </div>
 
 <div id="app">
-    <div class="server-rail">
-        <div class="server-icon" onclick="switchServer('S')">S</div>
-        <div class="server-icon v-server" onclick="switchServer('V')">V</div>
-        <div class="nuke-btn" onclick="askNuke()">DEL</div>
-    </div>
+    <div class="server-rail">
+        <div class="server-icon" onclick="switchServer('S')">S</div>
+        <div class="nuke-btn" onclick="openModal('nuke')">DEL</div>
+    </div>
 
-    <div class="sidebar">
-        <div class="sidebar-header" id="sidebarHeader">savchat (v6.2)</div>
-        <div class="channel-list">
-            <div class="category">Who's Online</div>
-            <div id="presenceList"></div>
-            <div id="channelGroups">
-                <div id="s-channels">
-                    <div class="category">Public Channels</div>
-                    <div class="channel active" onclick="changeChannel('general')">general</div>
-                    <div class="channel" onclick="changeChannel('game requests')">game requests</div>
-                    <div class="channel" onclick="changeChannel('updates')">updates to savnac</div>
-                    <div class="channel" onclick="changeChannel('game urls')">game urls</div>
-                    <div class="category">Joinable Rooms <span class="add-room-btn" onclick="openModal('joinRoom')">+</span></div>
-                    <div id="dynamicChannels"></div>
-                    <div class="category">Private</div>
-                    <div class="channel locked" onclick="attemptSecret()">private chat</div>
-                </div>
-                <div id="v-channels" style="display:none;">
-                    <div class="category">VVMS Rooms</div>
-                    <div class="channel" onclick="changeChannel('vvms general')">vvms general</div>
-                    <div class="channel" onclick="changeChannel('vvms random')">vvms random</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="sidebar">
+        <div class="sidebar-header" id="sidebarHeader">savchat (v6.0)</div>
+        <div class="channel-list">
+            <div class="category">Who's Online</div>
+            <div id="presenceList"></div>
+            <div id="channelGroups">
+                <div id="s-channels">
+                    <div class="category">Public Channels</div>
+                    <div class="channel active" onclick="changeChannel('general')">general</div>
+                    <div class="channel" onclick="changeChannel('game requests')">game requests</div>
+                    <div class="channel" onclick="changeChannel('updates')">updates to savnac</div>
+                    <div class="channel" onclick="changeChannel('game urls')">game urls</div>
+                    <div class="category">Joinable Rooms <span class="add-room-btn" onclick="openModal('joinRoom')">+</span></div>
+                    <div id="dynamicChannels"></div>
+                    <div class="category">Private</div>
+                    <div class="channel locked" onclick="attemptSecret()">private chat</div>
+                </div>
+                <div id="v-channels" style="display:none;">
+                    <div class="category">VVMS Rooms</div>
+                    <div class="channel" onclick="changeChannel('vvms general')">vvms general</div>
+                    <div class="channel" onclick="changeChannel('vvms random')">vvms random</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="chat-area">
-        <div class="chat-topbar">
-            <div class="topbar-left">
-                <div class="mobile-menu-toggle" onclick="toggleMenuNav()">#</div>
-                <span id="channelNameDisplay">general</span>
-            </div>
-            <div class="clear-channel-btn" onclick="askClearChannel()">🗑️</div>
-        </div>
-        <div class="messages" id="messageFeed"></div>
-        <div id="typingDisplay" style="font-size: 0.8rem; padding: 0 16px 8px; color: #b5bac1;"></div>
-        <div class="input-area">
-            <div id="replyBar" class="reply-bar">
-                <div>Replying to <span id="replyUser">User</span></div>
-                <div onclick="cancelReply()" style="cursor:pointer">✕</div>
-            </div>
-            <div class="input-box">
-                <input type="text" id="usernameInput" placeholder="User" readonly>
-                <input type="text" id="messageInput" placeholder="Message #general" autocomplete="off">
-            </div>
-        </div>
-    </div>
+    <div class="chat-area">
+        <div class="chat-topbar">
+            <div class="topbar-left">
+                <div class="mobile-menu-toggle" onclick="toggleMenuNav()">#</div>
+                <span id="channelNameDisplay">general</span>
+            </div>
+            <div class="topbar-right">
+                <div class="registry-btn" id="registryBtn" onclick="openModal('registry')">⚖️ REGISTRY</div>
+                <div class="clear-channel-btn" onclick="openModal('clearChannel')">🗑️</div>
+            </div>
+        </div>
+        <div class="messages" id="messageFeed"></div>
+        <div id="typingDisplay" style="font-size: 0.8rem; padding: 0 16px 8px; color: #b5bac1;"></div>
+        <div class="input-area">
+            <div id="replyBar" class="reply-bar">
+                <div>Replying to <span id="replyUser">User</span></div>
+                <div onclick="cancelReply()" style="cursor:pointer">✕</div>
+            </div>
+            <div class="input-box">
+                <input type="text" id="usernameInput" placeholder="User" readonly>
+                <input type="text" id="messageInput" placeholder="Message #general" autocomplete="off">
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="joinRoomModal" class="modal-overlay"><div class="modal"><h3>Join Private Room</h3><input type="text" id="roomCodeInput" placeholder="Room code..."><button style="background:var(--accent); color:white; padding:10px; width:100%; border:none; border-radius:4px;" onclick="joinRoom()">Join</button><button style="background:transparent; color:#949ba4; margin-top:10px; border:none;" onclick="closeModals()">Cancel</button></div></div>
 <div id="secretModal" class="modal-overlay"><div class="modal"><h3>private chat code</h3><input type="password" id="secretPass" placeholder="Password..."><button style="background:var(--accent); color:white; padding:10px; width:100%; border:none; border-radius:4px;" onclick="unlockSecret()">Enter</button></div></div>
 <div id="deleteModal" class="modal-overlay"><div class="modal"><h3>DELETE MESSAGE</h3><input type="password" id="deletePass" placeholder="Admin PIN..."><button style="background:var(--danger); color:white; padding:10px; width:100%; border:none; border-radius:4px;" onclick="confirmDelete()">DELETE</button></div></div>
-<div id="clearChannelModal" class="modal-overlay"><div class="modal"><h3>CLEAR CHANNEL</h3><input type="password" id="clearChannelPass" placeholder="Admin PIN..."><button style="background:var(--danger); color:white; padding:10px; width:100%; border:none; border-radius:4px;" onclick="confirmClearChannel()">WIPE</button></div></div>
-<div id="nukeModal" class="modal-overlay"><div class="modal"><h3>DELETE ALL DATA</h3><input type="password" id="nukePass" placeholder="Admin PIN..."><button style="background:var(--danger); color:white; padding:10px; width:100%; border:none; border-radius:4px;" onclick="confirmNuke()">CONFIRM</button></div></div>
+<div id="clearChannelModal" class="modal-overlay"><div class="modal"><h3>CLEAR CHANNEL</h3><input type="password" id="clearChannelPass" placeholder="Admin PIN..."><button style="background:var(--danger); color:white; padding:10px; width:100%; border:none; border-radius:4px;" onclick="clearChannelData()">WIPE</button></div></div>
+<div id="nukeModal" class="modal-overlay"><div class="modal"><h3>DELETE ALL DATA</h3><input type="password" id="nukePass" placeholder="Admin PIN..."><button style="background:var(--danger); color:white; padding:10px; width:100%; border:none; border-radius:4px;" onclick="nukeData()">CONFIRM</button></div></div>
 
+<div id="registryModal" class="modal-overlay">
+    <div class="modal" style="max-width: 400px;">
+        <h3 style="color:#FFD700;">Ban Registry</h3>
+        <p style="font-size:0.8rem; color:#949ba4; margin-bottom:15px;">Users currently in the Shadow Realm</p>
+        <div id="registryList" style="text-align:left; max-height:200px; overflow-y:auto; margin-bottom:15px; border-top: 1px solid #383a40; padding-top: 10px;"></div>
+        <button style="background:transparent; color:#949ba4; margin-top:10px; border:none; cursor:pointer;" onclick="closeModals()">Close</button>
+    </div>
+</div>
+
+<div id="banConfirmModal" class="modal-overlay">
+    <div class="confirm-modal">
+        <h3 id="banConfirmTitle" style="color:white; margin-bottom:10px;">Ban User?</h3>
+        <p id="banConfirmText" style="color:#b5bac1; font-size:0.9rem;"></p>
+        <div class="confirm-buttons">
+            <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+            <button id="executeBanBtn" class="btn-confirm">Hammer Time</button>
+        </div>
+    </div>
+</div>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
@@ -183,63 +216,141 @@ const supabase = createClient(
   "https://egzoadgouevjhsniogfq.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnem9hZGdvdWV2amhzbmlvZ2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTMyMTgsImV4cCI6MjA4NjQ4OTIxOH0.PEw4lLwyoHHfu7zGQIt-YuLiQdMsBs7GbVh36AgSK4g"
 )
-
+ 
 // --- CONFIG & BANS ---
-const shadowRealm = ['baduser1', 'tadder', 'random', 'cases','nixon','nigger','gay','jeffrey','goat','lincoln']; 
-const badWords = ['fuck','nigga','niga','nigger','dick','shit','ass','cum','penis','vagina','bitch','slut','whore','cock','retard'];
+const shadowRealm = ['baduser1', 'tadder', 'random', 'cases', 'Jeffrey E', 'CY is goat10', 'lincoln']; 
+const badWords = ['fuck','nigga','niga','nigger','dick','shit','ass','cum','penis','vagina','bitch','slut','whore','cock','retard','nlgger','cunt']; /* Paste your original array back here */ 
 const ADMIN_CODE = "savnacsigma"; 
 
-// --- SHADOW BAN LOGIC ---
-let violationCount = {}; 
-let localShadowRealm = []; 
-
-// --- NORMALIZATION FUNCTION ---
-function normalizeText(text) {
-    if (!text) return "";
-    const map = {
-        '1': 'i', '3': 'e', '4': 'a', '0': 'o', '7': 't', '5': 's', '8': 'b', '9': 'g',
-        '@': 'a', '$': 's', '!': 'i', 'v': 'v', 'x': 'x' 
-    };
-    return text.toLowerCase()
-        .replace(/[13407589@$!]/g, m => map[m])
-        .replace(/[^a-z0-9]/g, ''); // Removes spaces/dots: "f.u.c.k" -> "fuck"
-}
-
 let currentChannel = "general";
+let isAdminSession = false; 
 let joinedRooms = []; 
-let allKnownChannels = new Set();
+let globalRooms = new Set(); 
 let userPin = ""; 
 let displayedMessageIds = new Set();
 let messageToDeleteId = null; 
 let replyContext = null; 
-let onlineUsersList = new Set();
+let onlineUsersList = new Set(); 
 let canSendMessage = true; 
+let pendingBan = null; 
 
-const isAdmin = (name) => name === "Harrison" || name === "BONES!@##$#";
+// Dynamic Network Bans
+let liveBans = new Map(); 
 
-// --- FIXED: IMPROVED NAME FILTERING ---
+// ADD NEW ADMINS HERE
+const adminUsers = ["Harrison", "BONES!@##$#", "Carver", "Gusdog", "username"];
+const isAdmin = (name) => adminUsers.includes(name);
+
+const standardChannels = ['general', 'game requests', 'updates', 'game urls', 'private chat', 'vvms general', 'vvms random', 'admin-lounge', 'REGISTRY'];
+
+const leetspeakMap = {
+  a: '[a@4]',
+  c: '[c\\(k]',
+  e: '[e3]',
+  i: '[i!1l|]',
+  l: '[l1|]',
+  o: '[o0]',
+  s: '[s\\$5z]',
+  t: '[t7\\+]',
+};
+
+function buildBadWordRegex(word) {
+  const pattern = word
+    .toLowerCase()
+    .split('')
+    .map(char => leetspeakMap[char] || char)
+    .join('[\\W_]*?'); 
+  return new RegExp(`\\b(${pattern})\\b`, 'gi');
+}
+const badWordRegexes = badWords.map(word => buildBadWordRegex(word));
+
+// Pull real-time bans from Database
+async function loadLiveBans() {
+    const { data } = await supabase.from('feedback').select('*').eq('name', 'SYSTEM_BAN');
+    if (data) {
+        data.forEach(row => {
+            const parts = row.feedback.split('|');
+            if (parts[0] === 'BAN') {
+                liveBans.set(parts[1], { type: parts[2], expiresAt: parseInt(parts[3]), id: row.id });
+            }
+        });
+    }
+}
+
+// Check BOTH Hardcoded arrays and the Database records
 function checkBanStatus(username) {
     if (!username) return false;
-    const cleanName = normalizeText(username);
+    const normalized = username.toLowerCase().trim();
     
-    // 1. Check if name is in explicit shadowRealm
-    const isBanned = shadowRealm.some(banned => cleanName.includes(normalizeText(banned)));
-    
-    // 2. Check if name contains any badWords
-    const isProfane = badWords.some(word => cleanName.includes(word));
-    
-    // 3. Check local shadow ban session
-    const isShadowed = localShadowRealm.includes(username);
+    // 1. Check Hardcoded
+    let isHardcoded = shadowRealm.some(banned => buildBadWordRegex(banned).test(normalized));
+    if (isHardcoded) return true;
 
-    return isBanned || isProfane || isShadowed;
+    // 2. Check Live Database Bans
+    if (liveBans.has(normalized)) {
+        const banData = liveBans.get(normalized);
+        if (banData.type === 'temp') {
+            if (Date.now() > banData.expiresAt) return false; // Ban expired
+        }
+        return true; // Still banned
+    }
+    return false;
+}
+
+function isNameInappropriate(username) {
+    if (!username) return false;
+    const normalized = username.toLowerCase().trim();
+    return badWordRegexes.some(regex => {
+        regex.lastIndex = 0; 
+        return regex.test(normalized);
+    });
+}
+
+async function loadGlobalRooms() {
+    const me = document.getElementById('usernameInput').value;
+    if (!isAdmin(me)) return;
+
+    const { data } = await supabase.from('feedback').select('feedback');
+    if (!data) return;
+
+    data.forEach(row => {
+        const channel = row.feedback.split('|')[0];
+        if (!standardChannels.includes(channel) && !channel.startsWith('REGISTRY') && !channel.startsWith('BAN')) {
+            globalRooms.add(channel);
+        }
+    });
+    renderJoinedRooms();
 }
 
 // --- REAL-TIME SUBSCRIPTION ---
 supabase.channel('custom-all-channel')
   .on('postgres_changes', { event: '*', table: 'feedback', schema: 'public' }, (payload) => {
       if (payload.eventType === 'INSERT') {
+          
+          // Detect a new Ban Broadcast
+          if (payload.new.name === 'SYSTEM_BAN') {
+              const parts = payload.new.feedback.split('|');
+              liveBans.set(parts[1], { type: parts[2], expiresAt: parseInt(parts[3]), id: payload.new.id });
+              // SHADOW BAN TWEAK: Removed the location.reload() here so they don't get kicked live
+              return;
+          }
+
+          // Admin Room Watcher
+          const me = document.getElementById('usernameInput')?.value;
+          if (me && isAdmin(me)) {
+              const channel = payload.new.feedback.split('|')[0];
+              if (!standardChannels.includes(channel) && !channel.startsWith('REGISTRY') && !globalRooms.has(channel) && payload.new.name !== 'SYSTEM_BAN') {
+                  globalRooms.add(channel);
+                  renderJoinedRooms();
+              }
+          }
           loadMessages();
+
       } else if (payload.eventType === 'DELETE') {
+          // Check if an unban occurred
+          for (let [user, ban] of liveBans.entries()) {
+              if (ban.id === payload.old.id) liveBans.delete(user);
+          }
           document.getElementById(`msg-${payload.old.id}`)?.remove();
           displayedMessageIds.delete(payload.old.id);
       }
@@ -267,9 +378,12 @@ document.getElementById('joinBtn').addEventListener('click', async () => {
     const pinInput = document.getElementById('initialPinInput').value.trim();
     const errorDiv = document.getElementById('loginError');
 
-    // BLOCK BAD NAMES ON JOIN
-    if (checkBanStatus(nameInput) && !isAdmin(nameInput)) {
-        errorDiv.textContent = "Invalid username. Please pick another.";
+    await loadLiveBans(); 
+
+    // SHADOW BAN TWEAK: Removed the checkBanStatus() block here so they log in successfully
+
+    if (isNameInappropriate(nameInput)) {
+        errorDiv.textContent = "Inappropriate username.";
         return;
     }
 
@@ -292,54 +406,29 @@ document.getElementById('joinBtn').addEventListener('click', async () => {
         await supabase.from('feedback').insert([{ name: nameInput, feedback: `REGISTRY|${pinInput}|`, private: true }]);
     }
 
+    if (isAdmin(nameInput) || pinInput === ADMIN_CODE) isAdminSession = true;
+
     document.getElementById('usernameInput').value = nameInput;
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     
+    renderJoinedRooms();
     await presenceChannel.track({ username: nameInput });
     loadMessages();
+
+    if (isAdminSession) {
+        loadGlobalRooms();
+    }
 });
 
-window.switchServer = (server) => {
-    const sGroup = document.getElementById('s-channels');
-    const vGroup = document.getElementById('v-channels');
-    if (server === 'V') {
-        sGroup.style.display = 'none';
-        vGroup.style.display = 'block';
-        changeChannel('vvms general');
-    } else {
-        sGroup.style.display = 'block';
-        vGroup.style.display = 'none';
-        changeChannel('general');
-    }
-}
-
+// INSTANT OPTIMISTIC UI SEND
 window.sendMessage = async () => {
     const user = document.getElementById('usernameInput').value;
     const inputEl = document.getElementById('messageInput');
     const rawText = inputEl.value.trim();
     if(!rawText || !user || !canSendMessage) return;
     
-    const normalizedMsg = normalizeText(rawText);
-    const hasBadWord = badWords.some(word => normalizedMsg.includes(word));
-
-    if (hasBadWord && !isAdmin(user)) {
-        violationCount[user] = (violationCount[user] || 0) + 1;
-        if (violationCount[user] >= 3) {
-            localShadowRealm.push(user);
-        }
-    }
-
-    if (localShadowRealm.includes(user) || (checkBanStatus(user) && !isAdmin(user))) {
-        inputEl.value = '';
-        return; 
-    }
-
-    if (currentChannel === 'updates' && !isAdmin(user)) {
-        alert("Only Admins can post in the updates channel.");
-        inputEl.value = '';
-        return;
-    }
+    // SHADOW BAN TWEAK: Removed the location.reload() check here
 
     let finalContent = replyContext ? `<blockquote><strong>${replyContext.author}</strong><br>${replyContext.text}</blockquote>${rawText}` : rawText;
     cancelReply();
@@ -350,43 +439,86 @@ window.sendMessage = async () => {
         setTimeout(() => { canSendMessage = true; inputEl.disabled = false; }, 3000);
     }
 
-    await supabase.from('feedback').insert([{ name: user, feedback: `${currentChannel}|${finalContent}`, private: false }]);
     inputEl.value = '';
+    const feed = document.getElementById('messageFeed');
+    const tempId = 'temp-' + Date.now();
+    const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const isMsgAdmin = isAdmin(user);
+    const nameDisplay = isMsgAdmin ? `<span style="color: #FFD700; font-weight:bold;">👑 ${user}</span>` : `<span class="username">${user}</span>`;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.className = 'msg-group'; 
+    tempDiv.id = `msg-${tempId}`;
+    tempDiv.style.opacity = '0.6'; 
+    
+    tempDiv.innerHTML = `
+        <div class="msg-options">⋮</div>
+        <div class="msg-header">${nameDisplay} <span class="timestamp">${time}</span></div>
+        <div class="msg-content">${formatMessage(finalContent)}</div>`;
+    feed.appendChild(tempDiv);
+    feed.scrollTop = feed.scrollHeight;
+
+    // 👻 SHADOW BAN TWEAK: Stop the message from hitting the DB if they are banned
+    if (checkBanStatus(user)) {
+        tempDiv.style.opacity = '1'; // Make it look fully sent to them
+        return; 
+    }
+
+    const { data } = await supabase.from('feedback')
+        .insert([{ name: user, feedback: `${currentChannel}|${finalContent}`, private: false }])
+        .select();
+
+    if (data && data.length > 0) {
+        const realMsg = data[0];
+        displayedMessageIds.add(realMsg.id); 
+        
+        tempDiv.id = `msg-${realMsg.id}`;
+        tempDiv.style.opacity = '1'; 
+        
+        const safeContent = finalContent.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        
+        tempDiv.innerHTML = `
+            <div class="msg-options" onclick="toggleMsgMenu('${realMsg.id}')">⋮
+                <div class="menu-dropdown" id="menu-${realMsg.id}">
+                    <div class="menu-item" onclick="initReply('${realMsg.id}', '${realMsg.name}', '${safeContent}')">Reply</div>
+                    <div class="menu-item" onclick="askDelete('${realMsg.id}')" style="color:var(--danger)">Delete</div>
+                </div>
+            </div>
+            <div class="msg-header">${nameDisplay} <span class="timestamp">${time}</span></div>
+            <div class="msg-content">${formatMessage(finalContent)}</div>`;
+    } else {
+        tempDiv.style.color = 'var(--danger)';
+        tempDiv.querySelector('.msg-content').textContent = 'Failed to send message.';
+    }
 }
 
 async function loadMessages() {
     const me = document.getElementById('usernameInput').value;
     if(!me) return;
     
+    // SHADOW BAN TWEAK: Removed the 403 Access Denied block so they can load history
+
     const { data } = await supabase.from('feedback').select('*').order('created_at', { ascending: true });
     if(!data) return;
 
-    let newChannelsDetected = false;
-    data.forEach(msg => {
-        const parts = msg.feedback.split('|');
-        const channelName = parts[0];
-        if (channelName !== 'REGISTRY' && !allKnownChannels.has(channelName)) {
-            allKnownChannels.add(channelName);
-            newChannelsDetected = true;
-        }
-    });
-    
-    if(newChannelsDetected && isAdmin(me)) {
-        renderJoinedRooms();
-    } else if (document.getElementById('dynamicChannels').innerHTML === '') {
-        renderJoinedRooms();
-    }
-
     const feed = document.getElementById('messageFeed');
-    data.forEach(msg => {
+data.forEach(msg => {
         const parts = msg.feedback.split('|');
         const channel = parts[0];
         const content = parts.slice(1).join('|');
 
-        if (channel === 'REGISTRY' || channel !== currentChannel || displayedMessageIds.has(msg.id)) return;
-        if (checkBanStatus(msg.name) && !isAdmin(msg.name)) return;
+        if (msg.name === 'SYSTEM_BAN' || channel === 'REGISTRY' || channel !== currentChannel || displayedMessageIds.has(msg.id)) return;
+        
+        // This stops other people's clients from rendering the banned user's historical messages
+        if (checkBanStatus(msg.name)) return;
+
+        // 👻 ADD THIS: Hide the system ban announcement from the person who just got banned
+        if (msg.name === 'SYSTEM' && content.toLowerCase().includes(`**${me.toLowerCase()}** has been sent`)) {
+            return;
+        }
 
         displayedMessageIds.add(msg.id);
+       
         const time = new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         const div = document.createElement('div');
         div.className = 'msg-group'; div.id = `msg-${msg.id}`;
@@ -394,11 +526,17 @@ async function loadMessages() {
         const isMsgAdmin = isAdmin(msg.name);
         const nameDisplay = isMsgAdmin ? `<span style="color: #FFD700; font-weight:bold;">👑 ${msg.name}</span>` : `<span class="username">${msg.name}</span>`;
         
+        const banButtons = (isAdmin(me) && !isMsgAdmin) ? `
+            <div class="menu-item" onclick="banUser('${msg.name}', 'temp')" style="color:#f0b232">Temp Ban</div>
+            <div class="menu-item" onclick="banUser('${msg.name}', 'perm')" style="color:var(--danger); font-weight:bold;">PERMABAN</div>
+        ` : '';
+
         div.innerHTML = `
             <div class="msg-options" onclick="toggleMsgMenu('${msg.id}')">⋮
                 <div class="menu-dropdown" id="menu-${msg.id}">
                     <div class="menu-item" onclick="initReply('${msg.id}', '${msg.name}', '${content}')">Reply</div>
                     <div class="menu-item" onclick="askDelete('${msg.id}')" style="color:var(--danger)">Delete</div>
+                    ${banButtons}
                 </div>
             </div>
             <div class="msg-header">${nameDisplay} <span class="timestamp">${time}</span></div>
@@ -408,26 +546,56 @@ async function loadMessages() {
     });
 }
 
-function formatMessage(text) {
-    let clean = text;
-    const normalized = normalizeText(text);
+// --- BAN EXECUTION CORE WITH CUSTOM MODAL ---
+window.banUser = (targetUser, type) => {
+    pendingBan = { targetUser, type };
+    const warnType = type === 'temp' ? 'TEMP BAN (1 Hour)' : 'PERMABAN';
+    
+    document.getElementById('banConfirmTitle').textContent = warnType;
+    document.getElementById('banConfirmText').textContent = `Are you sure you want to strike ${targetUser}?`;
+    
+    document.getElementById('banConfirmModal').style.display = 'flex';
+    document.getElementById('executeBanBtn').onclick = executeHammer;
+}
 
-    badWords.forEach(word => {
-        if (normalized.includes(word)) {
-            const regex = new RegExp(word.split('').join('[^a-z]?'), 'gi');
-            clean = clean.replace(regex, '****');
-        }
-    });
+async function executeHammer() {
+    if (!pendingBan) return;
+    const { targetUser, type } = pendingBan;
+    const expiresAt = type === 'temp' ? Date.now() + (60 * 60 * 1000) : 0;
 
-    const imgMatch = clean.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i);
-    if(imgMatch) clean = clean.replace(imgMatch[0], '') + `<br><img src="${imgMatch[0]}" class="meme">`;
-    return clean;
+    // 1. Instantly push to local array so they are blocked right away
+    if (!shadowRealm.includes(targetUser.toLowerCase())) {
+        shadowRealm.push(targetUser.toLowerCase());
+    }
+
+    // 2. Log to DB using SYSTEM_BAN so the Real-time listener catches it
+    await supabase.from('feedback').insert([{ 
+        name: 'SYSTEM_BAN', 
+        feedback: `BAN|${targetUser.toLowerCase()}|${type}|${expiresAt}`, 
+        private: false 
+    }]);
+
+    // 3. Public announcement
+    const warnType = type === 'temp' ? 'TEMP BAN' : 'PERMABAN';
+    const sysMsg = `🚨 **SYSTEM:** **${targetUser}** has been sent to the shadow realm. [${warnType}]`;
+    await supabase.from('feedback').insert([{ 
+        name: 'SYSTEM', 
+        feedback: `${currentChannel}|${sysMsg}`, 
+        private: false 
+    }]);
+    
+    closeModals();
+    pendingBan = null;
+    document.querySelectorAll('.menu-dropdown').forEach(d => d.style.display = 'none');
 }
 
 window.attemptSecret = () => {
     const me = document.getElementById('usernameInput').value;
-    if (isAdmin(me)) changeChannel('private chat');
-    else openModal('secret');
+    if (isAdmin(me)) {
+        changeChannel('private chat');
+    } else {
+        openModal('secret');
+    }
 }
 
 window.unlockSecret = () => {
@@ -450,10 +618,18 @@ window.joinRoom = () => {
 }
 
 window.changeChannel = (channelName) => {
+    const me = document.getElementById('usernameInput').value;
     currentChannel = channelName;
     document.getElementById('messageFeed').innerHTML = '';
     displayedMessageIds.clear(); 
     document.getElementById('channelNameDisplay').textContent = channelName;
+    
+    if (channelName === 'admin-lounge' && isAdmin(me)) {
+        document.getElementById('registryBtn').style.display = 'block';
+    } else {
+        document.getElementById('registryBtn').style.display = 'none';
+    }
+
     renderJoinedRooms();
     loadMessages();
 }
@@ -462,38 +638,45 @@ function renderJoinedRooms() {
     const container = document.getElementById('dynamicChannels');
     const me = document.getElementById('usernameInput').value;
     container.innerHTML = '';
+    
+    if (isAdmin(me)) {
+        const loungeDiv = document.createElement('div');
+        loungeDiv.className = `channel ${currentChannel === 'admin-lounge' ? 'active' : ''}`;
+        loungeDiv.innerHTML = `<span style="color:#FFD700">🛡️ admin-lounge</span>`;
+        loungeDiv.onclick = () => changeChannel('admin-lounge');
+        container.appendChild(loungeDiv);
+
+        if (globalRooms.size > 0) {
+            const adminCat = document.createElement('div');
+            adminCat.className = 'category';
+            adminCat.innerHTML = `<span style="color:#FFD700">Admin Watch</span>`;
+            container.appendChild(adminCat);
+
+            globalRooms.forEach(room => {
+                const div = document.createElement('div');
+                div.className = `channel ${currentChannel === room ? 'active' : ''}`;
+                div.textContent = room;
+                div.onclick = () => changeChannel(room);
+                container.appendChild(div);
+            });
+            
+            if(joinedRooms.length > 0) {
+                const myCat = document.createElement('div');
+                myCat.className = 'category';
+                myCat.textContent = 'My Joined Rooms';
+                container.appendChild(myCat);
+            }
+        }
+    }
+
     joinedRooms.forEach(room => {
+        if (isAdmin(me) && globalRooms.has(room)) return;
         const div = document.createElement('div');
         div.className = `channel ${currentChannel === room ? 'active' : ''}`;
         div.textContent = room;
         div.onclick = () => changeChannel(room);
         container.appendChild(div);
     });
-
-    if (isAdmin(me)) {
-        const adminHeader = document.createElement('div');
-        adminHeader.className = 'category';
-        adminHeader.style.color = '#FFD700';
-        adminHeader.textContent = 'ADMIN: ALL DETECTED';
-        container.appendChild(adminHeader);
-
-        const adminLounge = document.createElement('div');
-        adminLounge.className = `channel ${currentChannel === 'admin-lounge' ? 'active' : ''}`;
-        adminLounge.innerHTML = `🛡️ admin-lounge`;
-        adminLounge.onclick = () => changeChannel('admin-lounge');
-        container.appendChild(adminLounge);
-
-        allKnownChannels.forEach(room => {
-            if(!['general','game requests','updates','game urls','vvms general','vvms random','private chat','admin-lounge'].includes(room)) {
-                const div = document.createElement('div');
-                div.className = `channel ${currentChannel === room ? 'active' : ''}`;
-                div.style.color = '#b5bac1';
-                div.textContent = `👁️ ${room}`;
-                div.onclick = () => changeChannel(room);
-                container.appendChild(div);
-            }
-        });
-    }
 }
 
 window.toggleMsgMenu = (id) => {
@@ -512,65 +695,65 @@ window.askDelete = (id) => {
 window.confirmDelete = async () => {
     const passInput = document.getElementById('deletePass');
     const me = document.getElementById('usernameInput').value;
+    
     if(isAdmin(me) || passInput.value === ADMIN_CODE) {
+        const msgElement = document.getElementById(`msg-${messageToDeleteId}`);
+        if (msgElement) msgElement.remove();
+        displayedMessageIds.delete(messageToDeleteId);
+
+        closeModals();
         await supabase.from('feedback').delete().eq('id', messageToDeleteId);
-        closeModals();
-        const el = document.getElementById(`msg-${messageToDeleteId}`);
-        if(el) el.remove();
     } else {
-        alert("Invalid Admin PIN");
-    }
-}
-
-window.askClearChannel = () => {
-    const me = document.getElementById('usernameInput').value;
-    if (isAdmin(me)) confirmClearChannel();
-    else openModal('clearChannel');
-}
-
-window.confirmClearChannel = async () => {
-    const passInput = document.getElementById('clearChannelPass');
-    const me = document.getElementById('usernameInput').value;
-    if(isAdmin(me) || passInput.value === ADMIN_CODE) {
-        const searchPattern = `${currentChannel}|%`;
-        await supabase.from('feedback').delete().ilike('feedback', searchPattern);
-        closeModals();
-        document.getElementById('messageFeed').innerHTML = '';
-        displayedMessageIds.clear();
-        loadMessages();
-    } else {
-        alert("Invalid Admin PIN");
-    }
-}
-
-window.askNuke = () => {
-    const me = document.getElementById('usernameInput').value;
-    if (isAdmin(me)) confirmNuke();
-    else openModal('nuke');
-}
-
-window.confirmNuke = async () => {
-    const passInput = document.getElementById('nukePass');
-    const me = document.getElementById('usernameInput').value;
-    if(isAdmin(me) || passInput.value === ADMIN_CODE) {
-        await supabase.from('feedback').delete().not('feedback', 'ilike', 'REGISTRY|%');
-        closeModals();
-        location.reload();
-    } else {
-        alert("Invalid Admin PIN");
+        alert("Incorrect PIN.");
     }
 }
 
 window.openModal = (type) => { 
+    const me = document.getElementById('usernameInput').value;
+    
+    if (isAdmin(me)) {
+        if (type === 'clearChannel') { clearChannelData(); return; }
+        if (type === 'nuke') { nukeData(); return; }
+        if (type === 'delete') { confirmDelete(); return; }
+    }
+
+    if (type === 'registry') {
+        const list = document.getElementById('registryList');
+        list.innerHTML = '';
+        
+        let activeCount = 0;
+        liveBans.forEach((ban, username) => {
+            if (ban.type === 'temp' && Date.now() > ban.expiresAt) return;
+            activeCount++;
+
+            const status = ban.type === 'temp' ? '<span style="color:#f0b232">⏳ Temp (1h)</span>' : '<span style="color:var(--danger)">💀 Permaban</span>';
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #2b2d31;">
+                <span style="color:#fff; font-weight:bold;">${username} <br><span style="font-size:0.75rem; font-weight:normal;">${status}</span></span>
+                <button onclick="unbanUser('${ban.id}', '${username}')" style="background:var(--success); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">UNBAN</button>
+            </div>`;
+        });
+
+        if (activeCount === 0) {
+            list.innerHTML = '<div style="color:#949ba4; text-align:center; padding: 20px 0;">No active bans in the shadow realm.</div>';
+        }
+
+        document.getElementById('registryModal').style.display = 'flex';
+        return;
+    }
+
     const modal = document.getElementById(type+'Modal');
-    modal.style.display = 'flex'; 
-    const input = modal.querySelector('input');
-    if(input) input.focus();
+    if (modal) {
+        modal.style.display = 'flex'; 
+        const input = modal.querySelector('input');
+        if(input) input.focus();
+    }
 }
+
 window.closeModals = () => { 
     document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
     document.querySelectorAll('input').forEach(i => { if(i.id.includes('Pass')) i.value = ''; });
-} 
+}
+
 window.cancelReply = () => { replyContext = null; document.getElementById('replyBar').style.display = 'none'; }
 window.initReply = (id, author, text) => {
     replyContext = { author, text };
@@ -578,18 +761,64 @@ window.initReply = (id, author, text) => {
     document.getElementById('replyBar').style.display = 'flex';
     document.getElementById('messageInput').focus();
 }
-window.toggleMenuNav = () => { document.body.classList.toggle('menu-open'); }
 
-// Listeners
+window.unbanUser = async (banId, username) => {
+    if (!isAdmin(document.getElementById('usernameInput').value)) return;
+    
+    await supabase.from('feedback').delete().eq('id', banId);
+    liveBans.delete(username);
+    openModal('registry'); 
+}
+
+function formatMessage(text) {
+    let clean = text;
+    
+    badWordRegexes.forEach(regex => {
+        clean = clean.replace(regex, match => '*'.repeat(match.length));
+    });
+
+    const imgMatch = clean.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i);
+    if(imgMatch) {
+        clean = clean.replace(imgMatch[0], '') + `<br><img src="${imgMatch[0]}" class="meme">`;
+    }
+    
+    return clean;
+}
+
+window.clearChannelData = async () => {
+    const passInput = document.getElementById('clearChannelPass');
+    const me = document.getElementById('usernameInput').value;
+    
+    if(isAdmin(me) || passInput.value === ADMIN_CODE) {
+        document.getElementById('messageFeed').innerHTML = '';
+        displayedMessageIds.clear();
+        closeModals();
+        await supabase.from('feedback').delete().ilike('feedback', `${currentChannel}|%`);
+    } else {
+        alert("Incorrect PIN.");
+    }
+}
+
+window.nukeData = async () => {
+    const passInput = document.getElementById('nukePass');
+    const me = document.getElementById('usernameInput').value;
+    
+    if(isAdmin(me) || passInput.value === ADMIN_CODE) {
+        document.getElementById('messageFeed').innerHTML = '';
+        displayedMessageIds.clear();
+        closeModals();
+        await supabase.from('feedback').delete().not('feedback', 'ilike', 'REGISTRY|%');
+    } else {
+        alert("Incorrect PIN.");
+    }
+}
+
+// Key Listeners
 document.getElementById('messageInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
 document.getElementById('secretPass').addEventListener('keypress', (e) => { if(e.key === 'Enter') unlockSecret(); });
 document.getElementById('roomCodeInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') joinRoom(); });
-document.getElementById('deletePass').addEventListener('keypress', (e) => { if(e.key === 'Enter') confirmDelete(); });
-document.getElementById('clearChannelPass').addEventListener('keypress', (e) => { if(e.key === 'Enter') confirmClearChannel(); });
-document.getElementById('nukePass').addEventListener('keypress', (e) => { if(e.key === 'Enter') confirmNuke(); });
+if(document.getElementById('deletePass')) document.getElementById('deletePass').addEventListener('keypress', (e) => { if(e.key === 'Enter') confirmDelete(); });
 document.getElementById('initialPinInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') document.getElementById('joinBtn').click(); });
-
-setInterval(loadMessages, 3000);
 </script>
 </body>
 </html>
