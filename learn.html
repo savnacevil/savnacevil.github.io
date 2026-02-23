@@ -3,40 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Can't Stop Lesson</title>
+  <title>Red Hot Chili Peppers — Can't Stop Guitar Lesson</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      width: 100%;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
 </head>
 <body>
-  <h1>Can't Stop Lesson</h1>
 
-  <!-- Buttons -->
-  <button id="playVideo">Video</button>
+  <video controls preload="auto">
+    <source src="https://archive.org/download/red-hot-chili-peppers-cant-stop-guitar-lesson/Red%20Hot%20Chili%20Peppers%20Can%27t%20Stop%20Guitar%20Lesson.mp4" type="video/mp4">
+    Your browser doesn’t support this video.
+  </video>
 
-  <!-- Hidden audio/video elements -->
-  <audio id="audioPlayer" controls style="display:none"></audio>
-  <video id="videoPlayer" controls style="display:none" width="480"></video>
-
-  <script>
-    const audioBtn = document.getElementById('playAudio');
-    const videoBtn = document.getElementById('playVideo');
-    const audioPlayer = document.getElementById('audioPlayer');
-    const videoPlayer = document.getElementById('videoPlayer');
-
-    // Replace with your archive.org URLs
-    const mp4Url = 'https://ia903109.us.archive.org/3/items/red-hot-chili-peppers-cant-stop-guitar-lesson/Red%20Hot%20Chili%20Peppers%20Can%27t%20Stop%20Guitar%20Lesson.mp4';
-
-    audioBtn.addEventListener('click', () => {
-      videoPlayer.pause(); // stop video if playing
-      audioPlayer.src = mp3Url;
-      audioPlayer.style.display = 'block';
-      audioPlayer.play();
-    });
-
-    videoBtn.addEventListener('click', () => {
-      audioPlayer.pause(); // stop audio if playing
-      videoPlayer.src = mp4Url;
-      videoPlayer.style.display = 'block';
-      videoPlayer.play();
-    });
-  </script>
 </body>
 </html>
