@@ -143,7 +143,7 @@ header {
 .song-item.playing .mini-bars { display: flex; }
 
 .song-num {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--muted);
   width: 22px;
   text-align: right;
@@ -240,7 +240,7 @@ header {
 
 /* ── Queue panel ── */
 .queue-panel {
-  width: 220px;
+  width: 100px;
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -491,7 +491,7 @@ audio { display: none; }
 
   <div class="queue-panel">
     <div class="queue-header">
-      <span>Queue <span id="queue-count">(0)</span></span>
+      <span><span id="queue-count">(0)</span></span>
       <button class="queue-clear" onclick="clearQueue()">Clear</button>
     </div>
     <div class="queue-list" id="queue-list">
@@ -509,7 +509,7 @@ audio { display: none; }
         <div class="now-playing-artist" id="now-artist">—</div>
       </div>
       <div class="volume-wrap">
-        <span class="vol-icon">🔈</span>
+        <span class="vol-icon"></span>
         <input type="range" id="volume" min="0" max="1" step="0.02" value="1">
       </div>
     </div>
@@ -522,9 +522,9 @@ audio { display: none; }
     </div>
     <div class="controls">
       <button class="ctrl-btn" id="shuffleBtn" onclick="toggleShuffle()" title="Shuffle">⇆</button>
-      <button class="ctrl-btn" onclick="prev()" title="Previous">⏮</button>
+      <button class="ctrl-btn" onclick="prev()" title="Previous">❮❮</button>
       <button class="ctrl-btn main-btn" id="playBtn" onclick="playPause()">▶</button>
-      <button class="ctrl-btn" onclick="next()" title="Next">⏭</button>
+      <button class="ctrl-btn" onclick="next()" title="Next">❯❯</button>
       <button class="ctrl-btn" id="repeatBtn" onclick="toggleRepeat()" title="Repeat">⟳</button>
     </div>
   </div>
@@ -552,6 +552,7 @@ rap:[
 {title:"God's Plan",artist:"Drake",url:"https://ia600303.us.archive.org/31/items/unconfirmed-58528/Drake%20-%20Gods%20Plan%20%28Clean%29.mp3"},
 {title:"One Dance",artist:"Drake",url:"https://ia600303.us.archive.org/31/items/unconfirmed-58528/Drake%20-%20One%20Dance%20%28Super%20Clean%20Version%29.mp3"},
 {title:"Toosie Slide",artist:"Drake",url:"https://ia600802.us.archive.org/0/items/without-me-eminem-clean-version/Drake%20-%20Toosie%20Slide%20%28Clean%20-%20Lyrics%29.mp3"},
+{title:"Nokia",artist:"Drake",url:"https://ia600108.us.archive.org/35/items/nokia-drake-clean/NOKIA%20-%20Drake%20%28clean%29.mp3"},
 {title:"MILLION DOLLAR BABY",artist:"Tommy Richman",url:"https://ia600602.us.archive.org/5/items/tommy-richman-million-dollar-baby-clean/Tommy%20Richman%20-%20MILLION%20DOLLAR%20BABY%20%28CLEAN%29.mp3"},
 {title:"Body",artist:"Don Toliver",url:"https://ia902803.us.archive.org/34/items/don-toliver-body-clean/Don%20Toliver%20Body%20Clean.mp3"},
 {title:"Butterfly Effect",artist:"Travis Scott",url:"https://ia601706.us.archive.org/30/items/butterfly-effect-clean/Butterfly%20effect%20%28clean%29.mp3"},
@@ -567,6 +568,9 @@ rap:[
 {title:"Smile",artist:"Juice WRLD ft. The Weeknd",url:"https://ia600802.us.archive.org/0/items/without-me-eminem-clean-version/Juice%20WRLD%20-%20Smile%20%28Clean%20-%20Lyrics%29%20ft.%20The%20Weeknd.mp3"},
 {title:"Candles",artist:"Juice WRLD",url:"https://ia600802.us.archive.org/0/items/without-me-eminem-clean-version/Juice%20WRLD%20-%20Candles%20%28clean%20version%29.mp3"},
 {title:"All Girls Are The Same",artist:"Juice WRLD",url:"https://ia600802.us.archive.org/0/items/without-me-eminem-clean-version/Juice%20WRLD%20-%20All%20Girls%20Are%20The%20Same%20%28Clean%29.mp3"},
+{title:"Righteous",artist:"Juice WRLD",url:"https://ia601609.us.archive.org/4/items/juice-wrld-righteous-clean-best-version/Juice%20WRLD%20-%20Righteous%20%28Clean%20-%20Best%20Version%29.mp3"},
+{title:"Armed + Dangerous",artist:"Juice WRLD",url:"https://ia601601.us.archive.org/5/items/juice-wrld-armed-and-dangerous-clean/Juice%20WRLD%20-%20Armed%20and%20Dangerous%20%28Clean%29.mp3"},
+{title:"Shoota",artist:"Playboi Carti ft. Lil Uzi",url:"https://ia803104.us.archive.org/23/items/shoota-clean-playboi-carti-feat.-lil-uzi-vert/Shoota%20%28Clean%29%20-%20Playboi%20Carti%20%28feat.%20Lil%20Uzi%20Vert%29.mp3"},
 {title:"Sky",artist:"Playboi Carti",url:"https://ia600402.us.archive.org/27/items/playboi-carti-sky-clean/Playboi%20Carti%20-%20Sky%20%28CLEAN%29.mp3"},
 {title:"Holiday",artist:"Green Day",url:"https://ia600802.us.archive.org/0/items/without-me-eminem-clean-version/Green%20Day%20-%20Holiday%20%28Official%20Audio%29.mp3"}
 ],
@@ -888,7 +892,7 @@ document.getElementById("progress-wrap").addEventListener("click", e => {
   audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
 });
 
-audio.onplay = () => { isPlaying = true; document.getElementById("playBtn").textContent = "⏸"; };
+audio.onplay = () => { isPlaying = true; document.getElementById("playBtn").textContent = "I I"; };
 audio.onpause = () => { if (!switching) { isPlaying = false; document.getElementById("playBtn").textContent = "▶"; } };
 audio.addEventListener("ended", () => {
   if (repeatMode) { playSong(currentIndex); return; }
