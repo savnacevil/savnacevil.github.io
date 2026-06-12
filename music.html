@@ -474,8 +474,9 @@ audio { display: none; }
   <a href="/learn.html" class="logo">MY MUSIC</a>
   <div class="header-right">
     <div class="genre-tabs">
-      <button class="genre-btn active" onclick="setGenre('rap', this)">Favorites</button>
+      <button class="genre-btn" onclick="setGenre('rap', this)">Favorites</button>
       <button class="genre-btn" onclick="setGenre('country', this)">Other</button>
+      <button class="genre-btn active" onclick="setGenre('playlist', this)">Playlist</button>
     </div>
   </div>
 </header>
@@ -573,7 +574,6 @@ rap:[
 {title:"Shoota",artist:"Playboi Carti ft. Lil Uzi",url:"https://ia803104.us.archive.org/23/items/shoota-clean-playboi-carti-feat.-lil-uzi-vert/Shoota%20%28Clean%29%20-%20Playboi%20Carti%20%28feat.%20Lil%20Uzi%20Vert%29.mp3"},
 {title:"Sky",artist:"Playboi Carti",url:"https://ia600402.us.archive.org/27/items/playboi-carti-sky-clean/Playboi%20Carti%20-%20Sky%20%28CLEAN%29.mp3"},
 {title:"Holiday",artist:"Green Day",url:"https://ia600802.us.archive.org/0/items/without-me-eminem-clean-version/Green%20Day%20-%20Holiday%20%28Official%20Audio%29.mp3"},
-{title:"blink-182 mix",artist:"BLINK-182",url:"https://ia601809.us.archive.org/2/items/blink-182-greatest-hits-playlist-2022-the-very-best-songs-of-blink-182-blink-182/Blink%20182%20Greatest%20Hits%20Playlist%202022%20_%20The%20Very%20Best%20Songs%20Of%20Blink%20182%20_%20Blink%20182%20Music%20Mix%202022%20%5BrR76XsMrip0%5D.mp3"}
 ],
 country:[
 {title:"Ordinary",artist:"Alex Warren",url:"https://ia600600.us.archive.org/33/items/alex-warren-ordinary-clean-lyrics/Alex%20Warren%20-%20Ordinary%20-%20Clean%20-%20Lyrics.mp3"},
@@ -583,11 +583,18 @@ country:[
 {title:"Whiskey Glasses",artist:"Morgan Wallen",url:"https://ia601601.us.archive.org/21/items/whiskey-glasses-morgan-wallen-clean-version-wlyrics/Whiskey%20GlassesMorgan%20Wallen%20%28clean%20version%20wlyrics%29.mp3"},
 {title:"Riptide",artist:"Vance Joy",url:"https://ia600605.us.archive.org/25/items/vance-joy-riptide-lyrics_202602/Vance%20Joy%20-%20Riptide%20%28Lyrics%29.mp3"},
 {title:"Take Me to Church",artist:"Hozier",url:"https://ia600605.us.archive.org/25/items/vance-joy-riptide-lyrics_202602/Hozier%20-%20Take%20Me%20To%20Church.mp3"}
+],
+playlist:[
+{title:"blink-182 mix",artist:"BLINK-182",url:"https://ia601809.us.archive.org/2/items/blink-182-greatest-hits-playlist-2022-the-very-best-songs-of-blink-182-blink-182/Blink%20182%20Greatest%20Hits%20Playlist%202022%20_%20The%20Very%20Best%20Songs%20Of%20Blink%20182%20_%20Blink%20182%20Music%20Mix%202022%20%5BrR76XsMrip0%5D.mp3"},
+{title:"weezer mix",artist:"WEEZER",url:"https://ia600706.us.archive.org/35/items/weezer-top-of-the-music-hits-2024-most-popular-hits-playlist/Weezer%20Top%20Of%20The%20Music%20Hits%202024%20-%20Most%20Popular%20Hits%20Playlist.mp3"},
+{title:"green day mix",artist:"GREEN DAY",url:"https://ia903205.us.archive.org/7/items/green-day-greatest-hits-full-album-the-best-of-green-day-green-day-best-songs-collection/GreenDay%20Greatest%20Hits%20Full%20Album%20%20The%20Best%20Of%20GreenDay%20%20%20GreenDay%20%20Best%20Songs%20Collection.mp3"},
+{title:"sublime mix - old",artist:"SUBLIME",url:"https://ia601900.us.archive.org/32/items/s-u-b-l-i-m-e-full-album-new-playlist-special-songs/S%20U%20B%20L%20I%20M%20E%20%20Full%20Album%20%20New%20Playlist%20%20Special%20Songs.mp3"},
+{title:"until the sun exploads - new",artist:"SUBLIME",url:"https://ia601607.us.archive.org/6/items/until-the-sun-explodes/Until%20The%20Sun%20Explodes.mp3"},
 ]
 };
 
 // ── State ──
-let genre = "rap";
+let genre = "playlist";
 let songs = library[genre];
 let currentIndex = -1;
 let shuffleMode = false;
